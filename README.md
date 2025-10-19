@@ -1,8 +1,8 @@
 # Running the Python Macro Project
 
 ## 1. Clone the repository
-git clone <your-repo-url>
-cd <repo-directory>
+git clone [<your-repo-url>](https://github.com/rdsp04/bpsr-fishing.git)
+cd [<repo-directory>](https://github.com/rdsp04/bpsr-fishing.git)
 
 ## 2. Create a virtual environment
 python -m venv venv
