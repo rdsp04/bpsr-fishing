@@ -14,8 +14,8 @@ CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 
-START_KEY = KeyCode(char='s')  # Press 's' to start
-STOP_KEY = KeyCode(char='x')   # Press 'x' to stop
+START_KEY = KeyCode(char="s")  # Press 's' to start
+STOP_KEY = KeyCode(char="x")  # Press 'x' to stop
 
 mouse = Controller()
 keyboard = KeyboardController()
@@ -39,14 +39,26 @@ def list_windows():
         print(f"[{i}] {title}")
     return windows
 
+def focus_blue_protocol_window():
+    target_title = "Blue Protocol: Star Resonance"
+    hwnd = win32gui.FindWindow(None, target_title)
+    if hwnd == 0:
+        print(f"Window '{target_title}' not found.")
+        return None
+    win32gui.ShowWindow(hwnd, 5)  # Restore if minimized
+    win32gui.SetForegroundWindow(hwnd)
+    return hwnd
+
+
 
 def select_window():
-    print("Select a window:")
-    windows = list_windows()
-    index = int(input("Enter window number: "))
-    title = windows[index]
-    print(f"Selected window: {title}")
-    return title
+    hwnd = focus_blue_protocol_window()
+    if hwnd:
+        print("Automatically selected Blue Protocol window.")
+        return "Blue Protocol: Star Resonance"
+    else:
+        raise Exception("Could not find Blue Protocol window.")
+
 
 
 def get_window_rect(title):
@@ -54,7 +66,6 @@ def get_window_rect(title):
     if not hwnd:
         return None
     return win32gui.GetWindowRect(hwnd)
-
 
 def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     rect = get_window_rect(window_title)
@@ -74,13 +85,16 @@ def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
         return None
 
     res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(res >= threshold)
-    for pt in zip(*loc[::-1]):
-        click_x = x1 + pt[0] + template.shape[1] // 2
-        click_y = y1 + pt[1] + template.shape[0] // 2
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+
+    # only accept strong matches
+    if max_val >= threshold:
+        click_x = x1 + max_loc[0] + template.shape[1] // 2
+        click_y = y1 + max_loc[1] + template.shape[0] // 2
         return click_x, click_y
 
     return None
+
 
 
 def click(x, y, hwnd):
@@ -102,10 +116,11 @@ def hold_key(key):
 def release_key(key):
     keyboard.release(key)
 
+
 def post_catch_loop(target_window, hwnd):
     global macro_running
     print("Fish took the bait")
-    print("Holding left click until continue.png is found")
+    print("Holding left click until continue.png or continue_highlighted.png is found")
 
     counter = 0
     last_print_time = time.time()
@@ -122,16 +137,65 @@ def post_catch_loop(target_window, hwnd):
             print(f"Held for {counter} ticks")
             last_print_time = time.time()
 
-        # Check for continue.png every 0.3s
+        # Check for continue every 0.3s
         if time.time() - last_check_time >= 0.3:
+            win_rect = get_window_rect(target_window)
+            if win_rect:
+                x1, y1, x2, y2 = win_rect
+                mouse.position = (x1 + 50, y1 + 50)  # move off button before scanning
+
+            # Try both normal and highlighted versions
             continue_found = find_image_in_window(target_window, "continue.png", 0.8)
+            if not continue_found:
+                continue_found = find_image_in_window(
+                    target_window, "continue_highlighted.png", 0.8
+                )
+
             last_check_time = time.time()
+
             if continue_found:
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
-                click(*continue_found, hwnd)
-                time.sleep(1)
-                print("Resuming normal loop")
+
+                # Try clicking multiple times until it disappears
+                for attempt in range(3):
+                  print(f"Attempt {attempt + 1}: trying to locate and click continue...")
+
+                  # Try multiple scans to catch movement
+                  continue_found = None
+                  for scan_try in range(5):
+                      continue_found = find_image_in_window(target_window, "continue.png", 0.75)
+                      if not continue_found:
+                          continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
+                      if continue_found:
+                          print(f"Found continue at {continue_found} (scan {scan_try + 1})")
+                          break
+                      time.sleep(0.1)  # brief delay between scans
+
+                  if not continue_found:
+                      print("Continue not found after multiple scans, skipping this attempt")
+                      continue
+
+                  click(*continue_found, hwnd)
+                  time.sleep(0.5)
+
+                  if win_rect:
+                      mouse.position = (x1 + 50, y1 + 50)
+
+                  still_there = find_image_in_window(target_window, "continue.png", 0.75)
+                  if not still_there:
+                      still_there = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
+
+                  if not still_there:
+                      print("Continue button gone, proceeding")
+                      time.sleep(1)
+                      return
+                  else:
+                      print(f"Click {attempt + 1} didn't register, retrying with new position...")
+
+
+
+                print("Continue button still visible after retries, returning anyway")
                 return
 
     mouse.release(Button.left)
@@ -158,7 +222,7 @@ def main():
 
             if find_image_in_window(target_window, "broken_pole.png", 0.9):
                 print("Broken pole detected -> pressing M")
-                press_key('m', hwnd)
+                press_key("m", hwnd)
                 time.sleep(0.2)
 
                 rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
@@ -171,41 +235,25 @@ def main():
                 continue
 
             time.sleep(0.2)
-            mouse.click(Button.left, 1)
+            # start fishing once. do not start post-catch until catch_fish appears
             mouse.click(Button.left, 1)
             print("Started fishing -> waiting for catch_fish.png")
             time.sleep(0.2)
 
             while macro_running:
-                catch_coords = find_image_in_window(target_window, "catch_fish.png", 0.9)
+                catch_coords = find_image_in_window(
+                    target_window, "catch_fish.png", 0.9
+                )
                 if catch_coords:
-                    print("Fish took the bait")
-                    print("Spamming left click until continue.png is found")
+                    # move mouse to the detected fish position
+                    mouse.position = catch_coords
+                    time.sleep(0.05)
 
-                    # === CHANGED SECTION START ===counter =
-                    last_check_time = time.time()
+                    # enter post-catch handling which presses and holds,
+                    # checks for continue.png and clicks it reliably
+                    post_catch_loop(target_window, hwnd)
 
-                    while macro_running:
-                        mouse.position = catch_coords
-                        post_catch_loop(target_window, hwnd)
-
-                        mouse.press(Button.left)
-
-
-                        # Only check for continue.png every 0.3 seconds
-                        if time.time() - last_check_time >= 0.3:
-                            mouse.release(Button.left)
-                            continue_found = find_image_in_window(target_window, "continue.png", 0.8)
-                            last_check_time = time.time()
-                            if continue_found:
-                                print("Continue button found, stopping spam")
-                                click(*continue_found, hwnd)
-                                time.sleep(1)
-                                post_catch_loop(target_window, hwnd)
-                                break
-
-
-
+                    # after post_catch_loop returns, break to outer loop
                     break
 
                 time.sleep(CHECK_INTERVAL)
