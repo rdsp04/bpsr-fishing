@@ -116,11 +116,10 @@ def hold_key(key):
 def release_key(key):
     keyboard.release(key)
 
-
 def post_catch_loop(target_window, hwnd):
     global macro_running
     print("Fish took the bait")
-    print("Holding left click until continue.png or continue_highlighted.png is found")
+    print("Holding left click until continue.png, continue_highlighted.png, or default_screen.png is found")
 
     counter = 0
     last_print_time = time.time()
@@ -137,19 +136,20 @@ def post_catch_loop(target_window, hwnd):
             print(f"Held for {counter} ticks")
             last_print_time = time.time()
 
-        # Check for continue every 0.3s
+        # Check for continue or default every 0.3s
         if time.time() - last_check_time >= 0.3:
             win_rect = get_window_rect(target_window)
             if win_rect:
                 x1, y1, x2, y2 = win_rect
                 mouse.position = (x1 + 50, y1 + 50)  # move off button before scanning
-
-            # Try both normal and highlighted versions
+            time.sleep(0.3)
+            # Try both normal and highlighted continue
             continue_found = find_image_in_window(target_window, "continue.png", 0.8)
             if not continue_found:
-                continue_found = find_image_in_window(
-                    target_window, "continue_highlighted.png", 0.8
-                )
+                continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.8)
+
+            # Also check for default screen (fishing failed)
+            default_found = find_image_in_window(target_window, "default_screen.png", 0.9)
 
             last_check_time = time.time()
 
@@ -157,48 +157,47 @@ def post_catch_loop(target_window, hwnd):
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
 
-                # Try clicking multiple times until it disappears
                 for attempt in range(3):
-                  print(f"Attempt {attempt + 1}: trying to locate and click continue...")
+                    continue_found = None
+                    for scan_try in range(5):
+                        continue_found = find_image_in_window(target_window, "continue.png", 0.75)
+                        if not continue_found:
+                            continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
+                        if continue_found:
+                            break
+                        time.sleep(0.1)
 
-                  # Try multiple scans to catch movement
-                  continue_found = None
-                  for scan_try in range(5):
-                      continue_found = find_image_in_window(target_window, "continue.png", 0.75)
-                      if not continue_found:
-                          continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
-                      if continue_found:
-                          print(f"Found continue at {continue_found} (scan {scan_try + 1})")
-                          break
-                      time.sleep(0.1)  # brief delay between scans
+                    if continue_found:
+                        click(*continue_found, hwnd)
+                        time.sleep(0.5)
 
-                  if not continue_found:
-                      print("Continue not found after multiple scans, skipping this attempt")
-                      continue
+                        if win_rect:
+                            mouse.position = (x1 + 50, y1 + 50)
 
-                  click(*continue_found, hwnd)
-                  time.sleep(0.5)
+                        still_there = find_image_in_window(target_window, "continue.png", 0.75)
+                        if not still_there:
+                            still_there = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
 
-                  if win_rect:
-                      mouse.position = (x1 + 50, y1 + 50)
-
-                  still_there = find_image_in_window(target_window, "continue.png", 0.75)
-                  if not still_there:
-                      still_there = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
-
-                  if not still_there:
-                      print("Continue button gone, proceeding")
-                      time.sleep(1)
-                      return
-                  else:
-                      print(f"Click {attempt + 1} didn't register, retrying with new position...")
-
-
+                        if not still_there:
+                            print("Continue button gone, proceeding")
+                            time.sleep(1)
+                            return
+                        else:
+                            print(f"Click {attempt + 1} didn't register, retrying with new position...")
+                    else:
+                        print("Continue not found after multiple scans, skipping this attempt")
 
                 print("Continue button still visible after retries, returning anyway")
                 return
 
+            elif default_found:
+                print("Default screen detected, minigame failed. Releasing click.")
+                mouse.release(Button.left)
+                time.sleep(0.5)
+                return
+
     mouse.release(Button.left)
+
 
 
 def main():
@@ -238,7 +237,7 @@ def main():
             # start fishing once. do not start post-catch until catch_fish appears
             mouse.click(Button.left, 1)
             print("Started fishing -> waiting for catch_fish.png")
-            time.sleep(0.2)
+            time.sleep(1)
 
             while macro_running:
                 catch_coords = find_image_in_window(
