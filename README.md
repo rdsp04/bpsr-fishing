@@ -22,7 +22,7 @@ If there is a `requirements.txt` file:
 pip install -r requirements.txt
 
 Otherwise, install manually:
-pip install pyautogui pynput opencv-python numpy pygetwindow
+pip install pyautogui pynput opencv-python numpy pygetwindow win32gui
 
 ## 5. Prepare the game
 - Set the game window to **1600x900 resolution**
