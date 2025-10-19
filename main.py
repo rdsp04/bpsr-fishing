@@ -12,7 +12,7 @@ from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 TARGET_IMAGES_FOLDER = "images"
 CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
-SPAM_CPS = 50
+SPAM_CPS = 20
 
 START_KEY = KeyCode(char='s')  # Press 's' to start
 STOP_KEY = KeyCode(char='x')   # Press 'x' to stop
@@ -102,74 +102,39 @@ def hold_key(key):
 def release_key(key):
     keyboard.release(key)
 
-
-def spam_left_click_at_position(x, y, cps, hwnd, duration=1):
-    interval = 1 / cps
-    start_time = time.time()
-    while time.time() - start_time < duration:
-        mouse.position = (x, y)
-        mouse.click(Button.left, 1)
-        time.sleep(interval)
-
-
 def post_catch_loop(target_window, hwnd):
     global macro_running
-    print("Post-catch: handling minigame with timed holds")
+    print("Fish took the bait")
+    print("Holding left click until continue.png is found")
 
-    hold_duration = 3       # seconds to hold a key
-    release_duration = 0.5  # seconds to release a key
-    key_state = {"a": False, "d": False}   # whether key is currently held
-    key_timer = {"a": 0, "d": 0}           # last hold/release timestamp
+    counter = 0
+    last_print_time = time.time()
+    last_check_time = time.time()
+
+    mouse.press(Button.left)
 
     while macro_running:
-        now = time.time()
+        counter += 1
+        time.sleep(1 / SPAM_CPS)
 
-        # Check arrows
-        arrows = {"a": "left.png", "d": "right.png"}
-        for key, arrow_file in arrows.items():
-            arrow_found = find_image_in_window(target_window, arrow_file)
+        # Print counter every second
+        if time.time() - last_print_time >= 1:
+            print(f"Held for {counter} ticks")
+            last_print_time = time.time()
 
-            if arrow_found:
-                # hold/release timing logic
-                if not key_state[key]:
-                    hold_key(key)
-                    key_state[key] = True
-                    key_timer[key] = now
-                elif key_state[key] and now - key_timer[key] >= hold_duration:
-                    release_key(key)
-                    key_state[key] = False
-                    key_timer[key] = now
-            else:
-                # release immediately if arrow not found
-                if key_state[key]:
-                    release_key(key)
-                    key_state[key] = False
+        # Check for continue.png every 0.3s
+        if time.time() - last_check_time >= 0.3:
+            continue_found = find_image_in_window(target_window, "continue.png", 0.8)
+            last_check_time = time.time()
+            if continue_found:
+                print("Continue button found, releasing click")
+                mouse.release(Button.left)
+                click(*continue_found, hwnd)
+                time.sleep(1)
+                print("Resuming normal loop")
+                return
 
-        # Check continue/default screen
-        continue_coords = find_image_in_window(target_window, "continue.png")
-        default_coords = find_image_in_window(target_window, "default_screen.png", 0.9)
-
-        if continue_coords:
-            time.sleep(1)
-            for _ in range(2):
-                click(*continue_coords, hwnd)
-                time.sleep(0.05)
-            for k in key_state:
-                if key_state[k]:
-                    release_key(k)
-                    key_state[k] = False
-            print("Continue button clicked, returning to default screen")
-            break
-
-        if default_coords:
-            for k in key_state:
-                if key_state[k]:
-                    release_key(k)
-                    key_state[k] = False
-            print("Minigame failed, returning to default screen")
-            break
-
-        time.sleep(CHECK_INTERVAL)
+    mouse.release(Button.left)
 
 
 def main():
@@ -186,13 +151,11 @@ def main():
             time.sleep(0.1)
             continue
 
-        # Step 1: Wait for default screen
         default_coords = find_image_in_window(target_window, "default_screen.png")
         if default_coords:
             print("Default screen detected")
             time.sleep(0.2)
 
-            # Step 2: Check broken pole
             if find_image_in_window(target_window, "broken_pole.png", 0.9):
                 print("Broken pole detected -> pressing M")
                 press_key('m', hwnd)
@@ -207,22 +170,42 @@ def main():
 
                 continue
 
-            # Step 3: Start fishing (no click spam yet)
             time.sleep(0.2)
+            mouse.click(Button.left, 1)
             mouse.click(Button.left, 1)
             print("Started fishing -> waiting for catch_fish.png")
             time.sleep(0.2)
 
-            # Step 4: Wait until catch_fish.png is visible
             while macro_running:
                 catch_coords = find_image_in_window(target_window, "catch_fish.png", 0.9)
                 if catch_coords:
-                    print("Fish detected -> starting catch")
-                    mouse.click(Button.left, 1)
-                    time.sleep(0.1)
-                    spam_left_click_at_position(catch_coords[0], catch_coords[1], cps=50, hwnd=hwnd, duration=1)
-                    print("Finished catching fish, entering post-catch loop")
-                    post_catch_loop(target_window, hwnd)
+                    print("Fish took the bait")
+                    print("Spamming left click until continue.png is found")
+
+                    # === CHANGED SECTION START ===counter =
+                    last_check_time = time.time()
+
+                    while macro_running:
+                        mouse.position = catch_coords
+                        post_catch_loop(target_window, hwnd)
+
+                        mouse.press(Button.left)
+
+
+                        # Only check for continue.png every 0.3 seconds
+                        if time.time() - last_check_time >= 0.3:
+                            mouse.release(Button.left)
+                            continue_found = find_image_in_window(target_window, "continue.png", 0.8)
+                            last_check_time = time.time()
+                            if continue_found:
+                                print("Continue button found, stopping spam")
+                                click(*continue_found, hwnd)
+                                time.sleep(1)
+                                post_catch_loop(target_window, hwnd)
+                                break
+
+
+
                     break
 
                 time.sleep(CHECK_INTERVAL)
