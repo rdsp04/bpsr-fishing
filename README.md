@@ -1,8 +1,7 @@
 # Running the Python Macro Project
 
 ## 1. Clone the repository
-git clone <your-repo-url>
-cd <repo-directory>
+git clone https://github.com/rdsp04/bpsr-fishing.git
 
 ## 2. Create a virtual environment
 python -m venv venv
@@ -23,7 +22,7 @@ If there is a `requirements.txt` file:
 pip install -r requirements.txt
 
 Otherwise, install manually:
-pip install pyautogui pynput opencv-python numpy pygetwindow
+pip install pyautogui pynput opencv-python numpy pygetwindow pywin32
 
 ## 5. Prepare the game
 - Set the game window to **1600x900 resolution**
