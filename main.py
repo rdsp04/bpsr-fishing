@@ -8,6 +8,8 @@ import os
 from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 saved_continue_pos = None  # global continue button position
+import json
+from datetime import datetime
 
 # === CONFIG ===
 TARGET_IMAGES_FOLDER = "images"
@@ -22,6 +24,57 @@ mouse = Controller()
 keyboard = KeyboardController()
 macro_running = False  # Global flag
 
+
+def log_broken_rod(filename="broken_rods.json"):
+    """
+    Logs a broken fishing rod event with timestamp.
+    Each event is appended to a JSON array in the file.
+    """
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "broken": True
+    }
+
+    # Read existing log
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []
+    else:
+        data = []
+
+    # Append new entry
+    data.append(entry)
+
+    # Write back
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
+
+def log_catch(status, filename="fishing_log.json"):
+    """Append a fishing result to a JSON file."""
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "catch": status
+    }
+
+    # Read existing logs
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            try:
+                data = json.load(f)
+            except json.JSONDecodeError:
+                data = []
+    else:
+        data = []
+
+    # Append new entry
+    data.append(entry)
+
+    # Write back
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=2)
 
 def on_press(key):
     global macro_running
@@ -168,6 +221,7 @@ def post_catch_loop(target_window, hwnd):
             if continue_found:
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
+                log_catch(True)
 
                 for attempt in range(3):
                     if saved_continue_pos:
@@ -203,6 +257,7 @@ def post_catch_loop(target_window, hwnd):
             elif default_found:
                 print("Default screen detected, minigame failed. Releasing click.")
                 mouse.release(Button.left)
+                log_catch(False)
                 time.sleep(0.5)
                 return
 
@@ -231,6 +286,7 @@ def main():
 
             if find_image_in_window(target_window, "broken_pole.png", 0.9):
                 print("Broken pole detected -> pressing M")
+                log_broken_rod()
                 press_key("m", hwnd)
                 time.sleep(0.2)
 
