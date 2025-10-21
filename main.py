@@ -180,7 +180,6 @@ def post_catch_loop(target_window, hwnd):
     last_check_time = time.time()
 
     mouse.press(Button.left)
-    saved_continue_pos = None  # store first found continue location
 
     while macro_running:
         counter += 1
