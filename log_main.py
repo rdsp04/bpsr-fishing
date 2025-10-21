@@ -53,7 +53,7 @@ def print_summary(summary):
         print(f"\nDate: {date}")
         for hour, counts in sorted(hours.items()):
             fpm = calculate_fish_per_minute(counts["times"])
-            print(f"  Hour {hour} -> Caught: {counts['catch']}, Missed: {counts['fail']}, Fish/Min: {fpm:.2f}")
+            print(f"  Hour {hour} -> Caught: {counts['catch']}, Missed: {counts['fail']}, Catch Rate: {counts['catch']/(counts['catch']+counts['fail'])*100:.2f}%, Fish/Min: {fpm:.2f}")
 
 if __name__ == "__main__":
     logs = load_logs(FILENAME)
