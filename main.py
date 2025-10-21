@@ -55,12 +55,14 @@ def log_broken_rod(filename="broken_rods.json"):
         json.dump(data, f, indent=2)
 
 
-def log_catch(status, filename="fishing_log.json"):
+def log_catch(status, filename="fishing_log.json", **extra):
     """Append a fishing result to a JSON file."""
     entry = {
         "timestamp": datetime.now().isoformat(),
         "catch": status
     }
+    entry.update(extra)
+
 
     # Read existing logs
     if os.path.exists(filename):
@@ -185,9 +187,38 @@ def post_catch_loop(target_window, hwnd):
 
     mouse.press(Button.left)
 
+    lane = 0
+    last_lane_action = time.time()
     while macro_running:
         counter += 1
         time.sleep(1 / SPAM_CPS)
+
+        right_found = find_image_in_window(target_window, "right.png", 0.8)
+        left_found = find_image_in_window(target_window, "left.png", 0.8)
+
+        if right_found:
+            lane += 1
+            if lane > 1:
+                lane = 1
+            print(f"Right arrow detected, lane = {lane}")
+            time.sleep(1)
+
+        elif left_found:
+            lane -= 1
+            if lane < -1:
+                lane = -1
+            print(f"Left arrow detected, lane = {lane}")
+            time.sleep(1)
+
+        if lane == -1:
+            hold_key("a")
+            release_key("d")
+        elif lane == 0:
+            release_key("a")
+            release_key("d")
+        elif lane == 1:
+            hold_key("d")
+            release_key("a")
 
         # Print counter every second
         if time.time() - last_print_time >= 1:
@@ -216,7 +247,28 @@ def post_catch_loop(target_window, hwnd):
 
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
-                log_catch(True)
+
+                # === CONDITIONAL FISH TYPE DETECTION ===
+                fish_type = None
+                fish_folder = os.path.join(TARGET_IMAGES_FOLDER, "fish")
+                if os.path.exists(fish_folder):
+                    for fname in os.listdir(fish_folder):
+                        if not fname.lower().endswith(".png"):
+                            continue
+                        match = find_image_in_window(target_window, os.path.join("fish", fname), 0.8)
+                        if match:
+                            fish_type = os.path.splitext(fname)[0]
+                            print(f"Detected fish type: {fish_type}")
+                            break
+                else:
+                    print("Fish folder not found")
+
+                # log with optional fish_type key
+                log_catch_args = {"status": True}
+                if fish_type:
+                    log_catch_args["fish_type"] = fish_type
+                log_catch(**log_catch_args)
+
 
                 for attempt in range(3):
                     if saved_continue_pos:
