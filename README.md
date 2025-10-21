@@ -1,40 +1,21 @@
-# Running the Python Macro Project
+# BPSR Fishing Macro
 
-## 1. Clone the repository
-git clone https://github.com/rdsp04/bpsr-fishing.git
+A fishing automation script for Blue Protocol: Star Resonance.
 
-## 2. Create a virtual environment
-python -m venv venv
+## Download
 
-## 3. Activate the virtual environment
+Download the latest executable here:  
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge)](https://github.com/rdsp04/bpsr-fishing/releases/latest)
 
-- **Windows (cmd):**
-venv\Scripts\activate
+## Instructions
 
-- **Windows (PowerShell):**
-venv\Scripts\Activate.ps1
+1. Set the game window to **1600x900 resolution**.  
+2. Run the game in **windowed mode**.  
+3. Ensure the player character is in a **fishing position** before starting.  
 
-- **macOS / Linux:**
-source venv/bin/activate
+## Usage
 
-## 4. Install dependencies
-If there is a `requirements.txt` file:
-pip install -r requirements.txt
+- Press **S** to start the macro.  
+- Press **X** to pause the macro.
+- Press **Ctrl+C** in the cmd to stop the macro.
 
-Otherwise, install manually:
-pip install pyautogui pynput opencv-python numpy pygetwindow pywin32
-
-## 5. Prepare the game
-- Set the game window to **1600x900 resolution**
-- Run the game in **windowed mode**
-- Ensure the player character is in a **fishing position** before starting
-
-## 6. Run the project
-python main.py
-
-- Press **s** to start the macro
-- Press **x** to pause/stop the macro
-- Press **Ctrl + C** to fully exit the program
-
-## 7. Deactivate the virtual environment (optional)
-deactivate
