@@ -10,6 +10,8 @@ from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 saved_continue_pos = None  # global continue button position
 import json
 from datetime import datetime
+import subprocess
+import sys
 
 # === CONFIG ===
 TARGET_IMAGES_FOLDER = "images"
@@ -257,57 +259,62 @@ def main():
 
     listener = Listener(on_press=on_press)
     listener.start()
+    try:
+      while True:
+          if not macro_running:
+              time.sleep(0.1)
+              continue
 
-    while True:
-        if not macro_running:
-            time.sleep(0.1)
-            continue
+          default_coords = find_image_in_window(target_window, "default_screen.png")
+          if default_coords:
+              print("Default screen detected")
+              time.sleep(0.2)
 
-        default_coords = find_image_in_window(target_window, "default_screen.png")
-        if default_coords:
-            print("Default screen detected")
-            time.sleep(0.2)
+              if find_image_in_window(target_window, "broken_pole.png", 0.9):
+                  print("Broken pole detected -> pressing M")
+                  log_broken_rod()
+                  press_key("m", hwnd)
+                  time.sleep(0.2)
 
-            if find_image_in_window(target_window, "broken_pole.png", 0.9):
-                print("Broken pole detected -> pressing M")
-                log_broken_rod()
-                press_key("m", hwnd)
-                time.sleep(0.2)
+                  rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
+                  if rod_coords:
+                      print("Clicking use_rod.png")
+                      time.sleep(2)
+                      click(*rod_coords, hwnd)
+                      time.sleep(2)
 
-                rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
-                if rod_coords:
-                    print("Clicking use_rod.png")
-                    time.sleep(2)
-                    click(*rod_coords, hwnd)
-                    time.sleep(2)
+                  continue
 
-                continue
+              time.sleep(0.2)
+              # start fishing once. do not start post-catch until catch_fish appears
+              mouse.click(Button.left, 1)
+              print("Started fishing -> waiting for catch_fish.png")
+              time.sleep(1)
 
-            time.sleep(0.2)
-            # start fishing once. do not start post-catch until catch_fish appears
-            mouse.click(Button.left, 1)
-            print("Started fishing -> waiting for catch_fish.png")
-            time.sleep(1)
+              while macro_running:
+                  catch_coords = find_image_in_window(
+                      target_window, "catch_fish.png", 0.9
+                  )
+                  if catch_coords:
+                      # move mouse to the detected fish position
+                      mouse.position = catch_coords
+                      time.sleep(0.05)
 
-            while macro_running:
-                catch_coords = find_image_in_window(
-                    target_window, "catch_fish.png", 0.9
-                )
-                if catch_coords:
-                    # move mouse to the detected fish position
-                    mouse.position = catch_coords
-                    time.sleep(0.05)
+                      # enter post-catch handling which presses and holds,
+                      # checks for continue.png and clicks it reliably
+                      post_catch_loop(target_window, hwnd)
 
-                    # enter post-catch handling which presses and holds,
-                    # checks for continue.png and clicks it reliably
-                    post_catch_loop(target_window, hwnd)
+                      # after post_catch_loop returns, break to outer loop
+                      break
 
-                    # after post_catch_loop returns, break to outer loop
-                    break
+                  time.sleep(CHECK_INTERVAL)
 
-                time.sleep(CHECK_INTERVAL)
-
-        time.sleep(CHECK_INTERVAL)
+          time.sleep(CHECK_INTERVAL)
+    except KeyboardInterrupt:
+        print("Ctrl+C pressed. Running log script...")
+        subprocess.run(["python", "log_main.py"])
+        print("Exiting.")
+        sys.exit()
 
 
 if __name__ == "__main__":
