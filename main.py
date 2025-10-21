@@ -52,6 +52,7 @@ def log_broken_rod(filename="broken_rods.json"):
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
+
 def log_catch(status, filename="fishing_log.json"):
     """Append a fishing result to a JSON file."""
     entry = {
@@ -76,6 +77,7 @@ def log_catch(status, filename="fishing_log.json"):
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
+
 def on_press(key):
     global macro_running
     if key == START_KEY:
@@ -93,6 +95,7 @@ def list_windows():
         print(f"[{i}] {title}")
     return windows
 
+
 def focus_blue_protocol_window():
     target_title = "Blue Protocol: Star Resonance"
     hwnd = win32gui.FindWindow(None, target_title)
@@ -104,7 +107,6 @@ def focus_blue_protocol_window():
     return hwnd
 
 
-
 def select_window():
     hwnd = focus_blue_protocol_window()
     if hwnd:
@@ -114,12 +116,12 @@ def select_window():
         raise Exception("Could not find Blue Protocol window.")
 
 
-
 def get_window_rect(title):
     hwnd = win32gui.FindWindow(None, title)
     if not hwnd:
         return None
     return win32gui.GetWindowRect(hwnd)
+
 
 def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     rect = get_window_rect(window_title)
@@ -150,7 +152,6 @@ def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     return None
 
 
-
 def click(x, y, hwnd):
     time.sleep(0.05)
     mouse.position = (x, y)
@@ -169,6 +170,7 @@ def hold_key(key):
 
 def release_key(key):
     keyboard.release(key)
+
 
 def post_catch_loop(target_window, hwnd):
     global macro_running, saved_continue_pos
@@ -198,26 +200,18 @@ def post_catch_loop(target_window, hwnd):
                 mouse.position = (x1 + 50, y1 + 50)
             time.sleep(0.3)
 
-            continue_found = None
-            if saved_continue_pos is None:
-                # Find continue on screen if we don’t have a saved position
-                continue_found = find_image_in_window(target_window, "continue.png", 0.8)
-                if continue_found:
-                    print(f"[LOG] Found continue.png at {continue_found}")
-                    saved_continue_pos = continue_found
-                else:
-                    continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.8)
-                    if continue_found:
-                        print(f"[LOG] Found continue_highlighted.png at {continue_found}")
-                        saved_continue_pos = continue_found
-            else:
-                # Use saved position
-                continue_found = saved_continue_pos
+            # ALWAYS check for continue buttons
+            continue_found = find_image_in_window(target_window, "continue.png", 0.8)
+            if not continue_found:
+                continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.8)
 
             default_found = find_image_in_window(target_window, "default_screen.png", 0.9)
             last_check_time = time.time()
 
             if continue_found:
+                if saved_continue_pos is None:
+                    saved_continue_pos = continue_found  # save first click position
+
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
                 log_catch(True)
@@ -242,14 +236,6 @@ def post_catch_loop(target_window, hwnd):
                     else:
                         print(f"Click {attempt + 1} didn't register, retrying...")
 
-                        # # Optional: recheck if the continue button moved
-                        # new_pos = find_image_in_window(target_window, "continue.png", 0.8)
-                        # if not new_pos:
-                        #     new_pos = find_image_in_window(target_window, "continue_highlighted.png", 0.8)
-                        # if new_pos:
-                        #     print(f"[LOG] Updated continue position {new_pos}")
-                        #     saved_continue_pos = new_pos
-
                 print("Continue button still visible after retries, returning anyway")
                 return
 
@@ -261,7 +247,6 @@ def post_catch_loop(target_window, hwnd):
                 return
 
     mouse.release(Button.left)
-
 
 
 def main():
