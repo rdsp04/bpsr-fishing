@@ -8,31 +8,28 @@ import os
 from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 
-saved_continue_pos = None  # global continue button position
+saved_continue_pos = None
 import json
 from datetime import datetime
-import subprocess
 import sys
 
-# === CONFIG ===
+
 TARGET_IMAGES_FOLDER = "images"
 CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 
-START_KEY = KeyCode(char="s")  # Press 's' to start
-STOP_KEY = KeyCode(char="x")  # Press 'x' to stop
+START_KEY = KeyCode(char="s")
+STOP_KEY = KeyCode(char="x")
 
 mouse = Controller()
 keyboard = KeyboardController()
-macro_running = False  # Global flag
+macro_running = False
 
 
 def log_broken_rod(filename="broken_rods.json"):
-    """
-    Logs a broken fishing rod event with timestamp.
-    Each event is appended to a JSON array in the file.
-    """
+    if getattr(sys, "frozen", False):
+      return
     entry = {"timestamp": datetime.now().isoformat(), "broken": True}
 
     # Read existing log
@@ -54,7 +51,9 @@ def log_broken_rod(filename="broken_rods.json"):
 
 
 def log_catch(status, filename="fishing_log.json", **extra):
-    """Append a fishing result to a JSON file."""
+    if getattr(sys, "frozen", False):
+      return
+
     entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
 
@@ -84,6 +83,14 @@ def on_press(key):
     elif key == STOP_KEY:
         macro_running = False
         print("Macro stopped")
+        if getattr(sys, "frozen", False):
+            return
+        try:
+
+            import log_main
+            log_main.run_summary()
+        except Exception as e:
+            print(f"Failed to run log_main.py: {e}")
 
 
 def list_windows():
@@ -133,7 +140,7 @@ def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     img_rgb = np.array(screenshot)
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, "frozen", False):
         # Running as .exe
         base_path = sys._MEIPASS
     else:
@@ -379,7 +386,6 @@ def main():
             time.sleep(CHECK_INTERVAL)
     except KeyboardInterrupt:
         print("Ctrl+C pressed. Running log script...")
-        subprocess.run(["python", "log_main.py"])
         print("Exiting.")
         sys.exit()
 

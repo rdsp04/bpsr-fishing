@@ -55,10 +55,14 @@ def print_summary(summary):
             fpm = calculate_fish_per_minute(counts["times"])
             print(f"  Hour {hour} -> Caught: {counts['catch']}, Missed: {counts['fail']}, Catch Rate: {counts['catch']/(counts['catch']+counts['fail'])*100:.2f}%, Fish/Min: {fpm:.2f}")
 
-if __name__ == "__main__":
+
+def run_summary():
     logs = load_logs(FILENAME)
     if logs:
         summary = summarize_logs(logs)
         print_summary(summary)
     else:
         print("No logs to display.")
+
+if __name__ == "__main__":
+    run_summary()
