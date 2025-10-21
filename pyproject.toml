@@ -9,6 +9,7 @@ dependencies = [
     "opencv-python>=4.11.0.86",
     "pyautogui>=0.9.54",
     "pygetwindow>=0.0.9",
+    "pyinstaller>=6.16.0",
     "pynput>=1.8.1",
     "pywin32>=311",
 ]

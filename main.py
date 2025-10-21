@@ -7,6 +7,7 @@ import win32gui
 import os
 from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
+
 saved_continue_pos = None  # global continue button position
 import json
 from datetime import datetime
@@ -32,10 +33,7 @@ def log_broken_rod(filename="broken_rods.json"):
     Logs a broken fishing rod event with timestamp.
     Each event is appended to a JSON array in the file.
     """
-    entry = {
-        "timestamp": datetime.now().isoformat(),
-        "broken": True
-    }
+    entry = {"timestamp": datetime.now().isoformat(), "broken": True}
 
     # Read existing log
     if os.path.exists(filename):
@@ -57,12 +55,8 @@ def log_broken_rod(filename="broken_rods.json"):
 
 def log_catch(status, filename="fishing_log.json", **extra):
     """Append a fishing result to a JSON file."""
-    entry = {
-        "timestamp": datetime.now().isoformat(),
-        "catch": status
-    }
+    entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
-
 
     # Read existing logs
     if os.path.exists(filename):
@@ -139,6 +133,14 @@ def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     img_rgb = np.array(screenshot)
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
+    if getattr(sys, 'frozen', False):
+        # Running as .exe
+        base_path = sys._MEIPASS
+    else:
+        # Running as script
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    TARGET_IMAGES_FOLDER = os.path.join(base_path, "images")
     path = os.path.join(TARGET_IMAGES_FOLDER, image_name)
     template = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if template is None:
@@ -179,7 +181,9 @@ def release_key(key):
 def post_catch_loop(target_window, hwnd):
     global macro_running, saved_continue_pos
     print("Fish took the bait")
-    print("Holding left click until continue.png, continue_highlighted.png, or default_screen.png is found")
+    print(
+        "Holding left click until continue.png, continue_highlighted.png, or default_screen.png is found"
+    )
 
     counter = 0
     last_print_time = time.time()
@@ -201,14 +205,14 @@ def post_catch_loop(target_window, hwnd):
             if lane > 1:
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
-            time.sleep(1)
+            time.sleep(0.2)
 
         elif left_found:
             lane -= 1
             if lane < -1:
                 lane = -1
             print(f"Left arrow detected, lane = {lane}")
-            time.sleep(1)
+            time.sleep(0.2)
 
         if lane == -1:
             hold_key("a")
@@ -236,9 +240,13 @@ def post_catch_loop(target_window, hwnd):
             # ALWAYS check for continue buttons
             continue_found = find_image_in_window(target_window, "continue.png", 0.8)
             if not continue_found:
-                continue_found = find_image_in_window(target_window, "continue_highlighted.png", 0.8)
+                continue_found = find_image_in_window(
+                    target_window, "continue_highlighted.png", 0.8
+                )
 
-            default_found = find_image_in_window(target_window, "default_screen.png", 0.9)
+            default_found = find_image_in_window(
+                target_window, "default_screen.png", 0.9
+            )
             last_check_time = time.time()
 
             if continue_found:
@@ -255,7 +263,9 @@ def post_catch_loop(target_window, hwnd):
                     for fname in os.listdir(fish_folder):
                         if not fname.lower().endswith(".png"):
                             continue
-                        match = find_image_in_window(target_window, os.path.join("fish", fname), 0.8)
+                        match = find_image_in_window(
+                            target_window, os.path.join("fish", fname), 0.8
+                        )
                         if match:
                             fish_type = os.path.splitext(fname)[0]
                             print(f"Detected fish type: {fish_type}")
@@ -269,23 +279,28 @@ def post_catch_loop(target_window, hwnd):
                     log_catch_args["fish_type"] = fish_type
                 log_catch(**log_catch_args)
 
-
                 for attempt in range(3):
                     if saved_continue_pos:
                         click(*saved_continue_pos, hwnd)
-                        print(f"[LOG] Clicked saved continue position {saved_continue_pos}")
+                        print(
+                            f"[LOG] Clicked saved continue position {saved_continue_pos}"
+                        )
                         time.sleep(0.5)
 
                     if win_rect:
                         mouse.position = (x1 + 50, y1 + 50)
 
-                    still_there = find_image_in_window(target_window, "continue.png", 0.75)
+                    still_there = find_image_in_window(
+                        target_window, "continue.png", 0.75
+                    )
                     if not still_there:
-                        still_there = find_image_in_window(target_window, "continue_highlighted.png", 0.75)
+                        still_there = find_image_in_window(
+                            target_window, "continue_highlighted.png", 0.75
+                        )
 
                     if not still_there:
                         print("Continue button gone, proceeding")
-                        time.sleep(1)
+                        time.sleep(0.2)
                         return
                     else:
                         print(f"Click {attempt + 1} didn't register, retrying...")
@@ -297,7 +312,7 @@ def post_catch_loop(target_window, hwnd):
                 print("Default screen detected, minigame failed. Releasing click.")
                 mouse.release(Button.left)
                 log_catch(False)
-                time.sleep(0.5)
+                time.sleep(0.2)
                 return
 
     mouse.release(Button.left)
@@ -312,56 +327,56 @@ def main():
     listener = Listener(on_press=on_press)
     listener.start()
     try:
-      while True:
-          if not macro_running:
-              time.sleep(0.1)
-              continue
+        while True:
+            if not macro_running:
+                time.sleep(0.1)
+                continue
 
-          default_coords = find_image_in_window(target_window, "default_screen.png")
-          if default_coords:
-              print("Default screen detected")
-              time.sleep(0.2)
+            default_coords = find_image_in_window(target_window, "default_screen.png")
+            if default_coords:
+                print("Default screen detected")
+                time.sleep(0.2)
 
-              if find_image_in_window(target_window, "broken_pole.png", 0.9):
-                  print("Broken pole detected -> pressing M")
-                  log_broken_rod()
-                  press_key("m", hwnd)
-                  time.sleep(0.2)
+                if find_image_in_window(target_window, "broken_pole.png", 0.9):
+                    print("Broken pole detected -> pressing M")
+                    log_broken_rod()
+                    press_key("m", hwnd)
+                    time.sleep(0.2)
 
-                  rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
-                  if rod_coords:
-                      print("Clicking use_rod.png")
-                      time.sleep(2)
-                      click(*rod_coords, hwnd)
-                      time.sleep(2)
+                    rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
+                    if rod_coords:
+                        print("Clicking use_rod.png")
+                        time.sleep(1)
+                        click(*rod_coords, hwnd)
+                        time.sleep(1)
 
-                  continue
+                    continue
 
-              time.sleep(0.2)
-              # start fishing once. do not start post-catch until catch_fish appears
-              mouse.click(Button.left, 1)
-              print("Started fishing -> waiting for catch_fish.png")
-              time.sleep(1)
+                time.sleep(0.2)
+                # start fishing once. do not start post-catch until catch_fish appears
+                mouse.click(Button.left, 1)
+                print("Started fishing -> waiting for catch_fish.png")
+                time.sleep(1)
 
-              while macro_running:
-                  catch_coords = find_image_in_window(
-                      target_window, "catch_fish.png", 0.9
-                  )
-                  if catch_coords:
-                      # move mouse to the detected fish position
-                      mouse.position = catch_coords
-                      time.sleep(0.05)
+                while macro_running:
+                    catch_coords = find_image_in_window(
+                        target_window, "catch_fish.png", 0.9
+                    )
+                    if catch_coords:
+                        # move mouse to the detected fish position
+                        mouse.position = catch_coords
+                        time.sleep(0.05)
 
-                      # enter post-catch handling which presses and holds,
-                      # checks for continue.png and clicks it reliably
-                      post_catch_loop(target_window, hwnd)
+                        # enter post-catch handling which presses and holds,
+                        # checks for continue.png and clicks it reliably
+                        post_catch_loop(target_window, hwnd)
 
-                      # after post_catch_loop returns, break to outer loop
-                      break
+                        # after post_catch_loop returns, break to outer loop
+                        break
 
-                  time.sleep(CHECK_INTERVAL)
+                    time.sleep(CHECK_INTERVAL)
 
-          time.sleep(CHECK_INTERVAL)
+            time.sleep(CHECK_INTERVAL)
     except KeyboardInterrupt:
         print("Ctrl+C pressed. Running log script...")
         subprocess.run(["python", "log_main.py"])
