@@ -11,8 +11,10 @@ class FishService:
             data = json.load(file)
         self.fishes = [
             Fish(
+                id=entry["id"],
                 image=entry["image"],
                 name=entry["name"],
+                xp=entry["xp"],
                 rarity=Rarity[entry["rarity"]]
             )
             for entry in data["fishes"]

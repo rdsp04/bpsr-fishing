@@ -8,6 +8,8 @@ from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 import pyautogui
 
+from app_path import get_app_path
+
 from src.screen_reader.screen_service import ScreenService
 from src.screen_reader.image_service import ImageService
 from src.screen_reader.base import RESOLUTION_FOLDER
@@ -32,9 +34,7 @@ macro_running = False
 
 
 # ---------------- Logging ----------------
-def log_broken_rod(filename="broken_rods.json"):
-    if getattr(sys, "frozen", False):
-        return
+def log_broken_rod(filename="logs/broken_rods.json"):
     entry = {"timestamp": datetime.now().isoformat(), "broken": True}
     data = []
     if os.path.exists(filename):
@@ -48,9 +48,7 @@ def log_broken_rod(filename="broken_rods.json"):
         json.dump(data, f, indent=2)
 
 
-def log_catch(status, filename="fishing_log.json", **extra):
-    if getattr(sys, "frozen", False):
-        return
+def log_catch(status, filename="logs/fishing_log.json", **extra):
     entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
     data = []
@@ -232,10 +230,7 @@ def post_catch_loop(window_title):
                             continue
                         fish_type, score = image_service.find_best_matching_fish(rect)
                         if fish_type:
-                            screenshot_path = os.path.join(
-                                screenshot_folder, f"screenshot_{fish_type}_{timestamp}.png"
-                            )
-                            print(f"Detected fish type: {fish_type} (score: {score:.3f}). Screenshot saved: {screenshot_path}")
+                            print(f"Detected fish type: {fish_type} (score: {score:.3f}).")
                             found = True
                             break
                         else:
@@ -371,4 +366,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print(get_app_path())
     main()

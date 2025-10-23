@@ -8,7 +8,8 @@ class Rarity(Enum):
 
 
 class Fish:
-    def __init__(self, image: str, name: str, xp: int, rarity: Rarity):
+    def __init__(self, id: str, image: str, name: str, xp: int, rarity: Rarity):
+        self.id = id
         self.image = image
         self.name = name
         self.xp = xp
