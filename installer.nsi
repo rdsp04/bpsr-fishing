@@ -7,7 +7,7 @@
 !define AppName "bpsr-fishing"
 !define AppExecutable "main.exe"
 !define InstallerFile "${AppName}Installer.exe"
-!define LicenseFile "LICENSE.txt" ; optional
+!define LicenseFile "LICENSE"
 
 Name "${AppName}"
 OutFile "${InstallerFile}"
@@ -18,7 +18,7 @@ RequestExecutionLevel admin
 ; Pages
 ;----------------
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${LicenseFile}"  ; remove if no license
+!insertmacro MUI_PAGE_LICENSE "${LicenseFile}"
 Page custom PageSelectShortcuts PageLeaveShortcuts
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
