@@ -29,7 +29,7 @@ macro_running = False
 
 def log_broken_rod(filename="broken_rods.json"):
     if getattr(sys, "frozen", False):
-      return
+        return
     entry = {"timestamp": datetime.now().isoformat(), "broken": True}
 
     # Read existing log
@@ -52,7 +52,7 @@ def log_broken_rod(filename="broken_rods.json"):
 
 def log_catch(status, filename="fishing_log.json", **extra):
     if getattr(sys, "frozen", False):
-      return
+        return
 
     entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
@@ -88,6 +88,7 @@ def on_press(key):
         try:
 
             import log_main
+
             log_main.run_summary()
         except Exception as e:
             print(f"Failed to run log_main.py: {e}")
@@ -128,6 +129,19 @@ def get_window_rect(title):
     return win32gui.GetWindowRect(hwnd)
 
 
+import pyautogui, time
+
+
+def safe_screenshot(region, retries=5, delay=2):
+    for i in range(retries):
+        try:
+            return pyautogui.screenshot(region=region)
+        except OSError:
+            print(f"Screenshot failed, retrying ({i+1}/{retries})...")
+            time.sleep(delay)
+    return None
+
+
 def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     rect = get_window_rect(window_title)
     if not rect:
@@ -136,7 +150,11 @@ def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
     x1, y1, x2, y2 = rect
     w, h = x2 - x1, y2 - y1
 
-    screenshot = pyautogui.screenshot(region=(x1, y1, w, h))
+    screenshot = safe_screenshot(region=(x1, y1, w, h))
+    if screenshot is None:
+        print("Screenshot failed after retries, skipping this cycle.")
+        return None
+
     img_rgb = np.array(screenshot)
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
@@ -267,16 +285,34 @@ def post_catch_loop(target_window, hwnd):
                 fish_type = None
                 fish_folder = os.path.join(TARGET_IMAGES_FOLDER, "fish")
                 if os.path.exists(fish_folder):
+                    found = False
                     for fname in os.listdir(fish_folder):
+
                         if not fname.lower().endswith(".png"):
                             continue
                         match = find_image_in_window(
-                            target_window, os.path.join("fish", fname), 0.8
+                            target_window, os.path.join("fish", fname), 0.6
                         )
                         if match:
                             fish_type = os.path.splitext(fname)[0]
                             print(f"Detected fish type: {fish_type}")
+                            screenshot_folder = "screenshots"
+                            os.makedirs(screenshot_folder, exist_ok=True)
+                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                            screenshot_path = os.path.join(screenshot_folder, f"screenshot_{fish_type}_{timestamp}.png")
+                            pyautogui.screenshot(screenshot_path)
+                            found = True
                             break
+                    if not found:
+                        screenshot_folder = "screenshots"
+                        os.makedirs(screenshot_folder, exist_ok=True)
+                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                        screenshot_path = os.path.join(screenshot_folder, f"screenshot_{timestamp}.png")
+                        pyautogui.screenshot(screenshot_path)
+                        print(
+                            f"No fish detected. Screenshot saved as {screenshot_path}"
+                        )
+
                 else:
                     print("Fish folder not found")
 
