@@ -1,20 +1,24 @@
 import time
-import cv2
-import numpy as np
-import pyautogui
-import pygetwindow as gw
-import win32gui
 import os
-from pynput.mouse import Controller, Button
-from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
-
-saved_continue_pos = None
+import sys
 import json
 from datetime import datetime
-import sys
+import win32gui
+from pynput.mouse import Controller, Button
+from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
+import pyautogui
 
+from src.screen_reader.screen_service import ScreenService
+from src.screen_reader.image_service import ImageService
+from src.screen_reader.base import RESOLUTION_FOLDER
 
+# Services
+screen_service = ScreenService()
+image_service = ImageService()
+
+# Globals
 TARGET_IMAGES_FOLDER = "images"
+saved_continue_pos = None
 CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
@@ -27,25 +31,19 @@ keyboard = KeyboardController()
 macro_running = False
 
 
+# ---------------- Logging ----------------
 def log_broken_rod(filename="broken_rods.json"):
     if getattr(sys, "frozen", False):
         return
     entry = {"timestamp": datetime.now().isoformat(), "broken": True}
-
-    # Read existing log
+    data = []
     if os.path.exists(filename):
         with open(filename, "r") as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
                 data = []
-    else:
-        data = []
-
-    # Append new entry
     data.append(entry)
-
-    # Write back
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
@@ -53,28 +51,21 @@ def log_broken_rod(filename="broken_rods.json"):
 def log_catch(status, filename="fishing_log.json", **extra):
     if getattr(sys, "frozen", False):
         return
-
     entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
-
-    # Read existing logs
+    data = []
     if os.path.exists(filename):
         with open(filename, "r") as f:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
                 data = []
-    else:
-        data = []
-
-    # Append new entry
     data.append(entry)
-
-    # Write back
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
 
+# ---------------- Input ----------------
 def on_press(key):
     global macro_running
     if key == START_KEY:
@@ -86,7 +77,6 @@ def on_press(key):
         if getattr(sys, "frozen", False):
             return
         try:
-
             import log_main
 
             log_main.run_summary()
@@ -94,21 +84,14 @@ def on_press(key):
             print(f"Failed to run log_main.py: {e}")
 
 
-def list_windows():
-    windows = gw.getAllTitles()
-    windows = [w for w in windows if w.strip()]
-    for i, title in enumerate(windows):
-        print(f"[{i}] {title}")
-    return windows
-
-
+# ---------------- Window Handling ----------------
 def focus_blue_protocol_window():
     target_title = "Blue Protocol: Star Resonance"
     hwnd = win32gui.FindWindow(None, target_title)
     if hwnd == 0:
         print(f"Window '{target_title}' not found.")
         return None
-    win32gui.ShowWindow(hwnd, 5)  # Restore if minimized
+    win32gui.ShowWindow(hwnd, 5)
     win32gui.SetForegroundWindow(hwnd)
     return hwnd
 
@@ -129,67 +112,14 @@ def get_window_rect(title):
     return win32gui.GetWindowRect(hwnd)
 
 
-import pyautogui, time
-
-
-def safe_screenshot(region, retries=5, delay=2):
-    for i in range(retries):
-        try:
-            return pyautogui.screenshot(region=region)
-        except OSError:
-            print(f"Screenshot failed, retrying ({i+1}/{retries})...")
-            time.sleep(delay)
-    return None
-
-
-def find_image_in_window(window_title, image_name, threshold=THRESHOLD):
-    rect = get_window_rect(window_title)
-    if not rect:
-        return None
-
-    x1, y1, x2, y2 = rect
-    w, h = x2 - x1, y2 - y1
-
-    screenshot = safe_screenshot(region=(x1, y1, w, h))
-    if screenshot is None:
-        print("Screenshot failed after retries, skipping this cycle.")
-        return None
-
-    img_rgb = np.array(screenshot)
-    img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-
-    if getattr(sys, "frozen", False):
-        # Running as .exe
-        base_path = sys._MEIPASS
-    else:
-        # Running as script
-        base_path = os.path.dirname(os.path.abspath(__file__))
-
-    TARGET_IMAGES_FOLDER = os.path.join(base_path, "images")
-    path = os.path.join(TARGET_IMAGES_FOLDER, image_name)
-    template = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    if template is None:
-        return None
-
-    res = cv2.matchTemplate(img_gray, template, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-
-    # only accept strong matches
-    if max_val >= threshold:
-        click_x = x1 + max_loc[0] + template.shape[1] // 2
-        click_y = y1 + max_loc[1] + template.shape[0] // 2
-        return click_x, click_y
-
-    return None
-
-
-def click(x, y, hwnd):
+# ---------------- Actions ----------------
+def click(x, y):
     time.sleep(0.05)
     mouse.position = (x, y)
     mouse.click(Button.left, 1)
 
 
-def press_key(key, hwnd):
+def press_key(key):
     time.sleep(0.05)
     keyboard.press(key)
     keyboard.release(key)
@@ -203,27 +133,30 @@ def release_key(key):
     keyboard.release(key)
 
 
-def post_catch_loop(target_window, hwnd):
+# ---------------- Fishing Logic ----------------
+def post_catch_loop(window_title):
     global macro_running, saved_continue_pos
     print("Fish took the bait")
-    print(
-        "Holding left click until continue.png, continue_highlighted.png, or default_screen.png is found"
-    )
-
     counter = 0
     last_print_time = time.time()
     last_check_time = time.time()
-
     mouse.press(Button.left)
 
     lane = 0
-    last_lane_action = time.time()
     while macro_running:
         counter += 1
         time.sleep(1 / SPAM_CPS)
 
-        right_found = find_image_in_window(target_window, "right.png", 0.8)
-        left_found = find_image_in_window(target_window, "left.png", 0.8)
+        rect = get_window_rect(window_title)
+
+        right_found = image_service.find_image_in_window(
+            rect,
+            os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "right.png"),
+            0.8,
+        )
+        left_found = image_service.find_image_in_window(
+            rect, os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "left.png"), 0.8
+        )
 
         if right_found:
             lane += 1
@@ -231,7 +164,6 @@ def post_catch_loop(target_window, hwnd):
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
             time.sleep(0.2)
-
         elif left_found:
             lane -= 1
             if lane < -1:
@@ -249,181 +181,193 @@ def post_catch_loop(target_window, hwnd):
             hold_key("d")
             release_key("a")
 
-        # Print counter every second
         if time.time() - last_print_time >= 1:
             print(f"Held for {counter} ticks")
             last_print_time = time.time()
 
-        # Check every 0.3s
         if time.time() - last_check_time >= 0.3:
-            win_rect = get_window_rect(target_window)
-            if win_rect:
-                x1, y1, x2, y2 = win_rect
-                mouse.position = (x1 + 50, y1 + 50)
-            time.sleep(0.3)
-
-            # ALWAYS check for continue buttons
-            continue_found = find_image_in_window(target_window, "continue.png", 0.8)
+            continue_found = image_service.find_image_in_window(
+                rect,
+                os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "continue.png"),
+                0.8,
+            )
             if not continue_found:
-                continue_found = find_image_in_window(
-                    target_window, "continue_highlighted.png", 0.8
+                continue_found = image_service.find_image_in_window(
+                    rect,
+                    os.path.join(
+                        TARGET_IMAGES_FOLDER,
+                        RESOLUTION_FOLDER,
+                        "continue_highlighted.png",
+                    ),
+                    0.8,
                 )
-
-            default_found = find_image_in_window(
-                target_window, "default_screen.png", 0.9
+            default_found = image_service.find_image_in_window(
+                rect,
+                os.path.join(
+                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "default_screen.png"
+                ),
+                0.9,
             )
             last_check_time = time.time()
 
             if continue_found:
                 if saved_continue_pos is None:
-                    saved_continue_pos = continue_found  # save first click position
-
+                    saved_continue_pos = continue_found
                 print("Continue button found, releasing click")
                 mouse.release(Button.left)
 
-                # === CONDITIONAL FISH TYPE DETECTION ===
+                # === Fish Detection + Screenshot ===
+                fish_folder = os.path.join(
+                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "fish"
+                )
                 fish_type = None
-                fish_folder = os.path.join(TARGET_IMAGES_FOLDER, "fish")
+                screenshot_folder = "screenshots"
+                os.makedirs(screenshot_folder, exist_ok=True)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
                 if os.path.exists(fish_folder):
                     found = False
                     for fname in os.listdir(fish_folder):
-
                         if not fname.lower().endswith(".png"):
                             continue
-                        match = find_image_in_window(
-                            target_window, os.path.join("fish", fname), 0.6
-                        )
-                        if match:
-                            fish_type = os.path.splitext(fname)[0]
-                            print(f"Detected fish type: {fish_type}")
-                            screenshot_folder = "screenshots"
-                            os.makedirs(screenshot_folder, exist_ok=True)
-                            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            screenshot_path = os.path.join(screenshot_folder, f"screenshot_{fish_type}_{timestamp}.png")
-                            pyautogui.screenshot(screenshot_path)
+                        fish_type, score = image_service.find_best_matching_fish(rect)
+                        if fish_type:
+                            screenshot_path = os.path.join(
+                                screenshot_folder, f"screenshot_{fish_type}_{timestamp}.png"
+                            )
+                            print(f"Detected fish type: {fish_type} (score: {score:.3f}). Screenshot saved: {screenshot_path}")
                             found = True
                             break
+                        else:
+                            screenshot_path = os.path.join(screenshot_folder, f"screenshot_{timestamp}.png")
+                            pyautogui.screenshot(screenshot_path)
+                            print(f"No fish detected. Screenshot saved: {screenshot_path}")
+
                     if not found:
-                        screenshot_folder = "screenshots"
-                        os.makedirs(screenshot_folder, exist_ok=True)
-                        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                        screenshot_path = os.path.join(screenshot_folder, f"screenshot_{timestamp}.png")
-                        pyautogui.screenshot(screenshot_path)
-                        print(
-                            f"No fish detected. Screenshot saved as {screenshot_path}"
+                        screenshot_path = os.path.join(
+                            screenshot_folder, f"screenshot_{timestamp}.png"
                         )
-
+                        pyautogui.screenshot(screenshot_path)
+                        print(f"No fish detected. Screenshot saved: {screenshot_path}")
                 else:
-                    print("Fish folder not found")
+                    print("Fish folder not found, taking default screenshot")
+                    screenshot_path = os.path.join(
+                        screenshot_folder, f"screenshot_{timestamp}.png"
+                    )
+                    pyautogui.screenshot(screenshot_path)
 
-                # log with optional fish_type key
-                log_catch_args = {"status": True}
+                # Logging
+                log_args = {"status": True}
                 if fish_type:
-                    log_catch_args["fish_type"] = fish_type
-                log_catch(**log_catch_args)
+                    log_args["fish_type"] = fish_type
+                log_catch(**log_args)
 
+                # Click saved continue position with retries
                 for attempt in range(3):
                     if saved_continue_pos:
-                        click(*saved_continue_pos, hwnd)
-                        print(
-                            f"[LOG] Clicked saved continue position {saved_continue_pos}"
-                        )
+                        click(*saved_continue_pos)
                         time.sleep(0.5)
-
-                    if win_rect:
-                        mouse.position = (x1 + 50, y1 + 50)
-
-                    still_there = find_image_in_window(
-                        target_window, "continue.png", 0.75
+                    still_there = image_service.find_image_in_window(
+                        rect,
+                        os.path.join(
+                            TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "continue.png"
+                        ),
+                        0.75,
                     )
                     if not still_there:
-                        still_there = find_image_in_window(
-                            target_window, "continue_highlighted.png", 0.75
+                        still_there = image_service.find_image_in_window(
+                            rect,
+                            os.path.join(
+                                TARGET_IMAGES_FOLDER,
+                                RESOLUTION_FOLDER,
+                                "continue_highlighted.png",
+                            ),
+                            0.75,
                         )
-
                     if not still_there:
-                        print("Continue button gone, proceeding")
-                        time.sleep(0.2)
-                        return
-                    else:
-                        print(f"Click {attempt + 1} didn't register, retrying...")
+                        break
 
-                print("Continue button still visible after retries, returning anyway")
                 return
 
             elif default_found:
                 print("Default screen detected, minigame failed. Releasing click.")
                 mouse.release(Button.left)
                 log_catch(False)
-                time.sleep(0.2)
                 return
 
-    mouse.release(Button.left)
 
-
+# ---------------- Main Loop ----------------
 def main():
     global macro_running
-    target_window = select_window()
-    hwnd = win32gui.FindWindow(None, target_window)
+    window_title = select_window()
     print(f"Macro waiting for START key ({START_KEY.char})")
 
     listener = Listener(on_press=on_press)
     listener.start()
-    try:
-        while True:
-            if not macro_running:
-                time.sleep(0.1)
+
+    while True:
+        if not macro_running:
+            time.sleep(0.1)
+            continue
+
+        rect = get_window_rect(window_title)
+
+        default_found = image_service.find_image_in_window(
+            rect,
+            os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "default_screen.png"),
+            THRESHOLD,
+        )
+        if default_found:
+            print("Default screen detected")
+            time.sleep(0.2)
+
+            # Broken rod handling
+            broken_pole = image_service.find_image_in_window(
+                rect,
+                os.path.join(
+                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "broken_pole.png"
+                ),
+                0.9,
+            )
+            if broken_pole:
+                print("Broken pole detected -> pressing M")
+                log_broken_rod()
+                press_key("m")
+                time.sleep(0.2)
+                use_rod = image_service.find_image_in_window(
+                    rect,
+                    os.path.join(
+                        TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "use_rod.png"
+                    ),
+                    0.9,
+                )
+                if use_rod:
+                    click(*use_rod)
+                    time.sleep(1)
                 continue
 
-            default_coords = find_image_in_window(target_window, "default_screen.png")
-            if default_coords:
-                print("Default screen detected")
-                time.sleep(0.2)
+            # Start fishing
+            mouse.click(Button.left, 1)
+            print("Started fishing -> waiting for catch_fish.png")
+            time.sleep(1)
 
-                if find_image_in_window(target_window, "broken_pole.png", 0.9):
-                    print("Broken pole detected -> pressing M")
-                    log_broken_rod()
-                    press_key("m", hwnd)
-                    time.sleep(0.2)
+            while macro_running:
+                catch_coords = image_service.find_image_in_window(
+                    rect,
+                    os.path.join(
+                        TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "catch_fish.png"
+                    ),
+                    0.9,
+                )
+                if catch_coords:
+                    mouse.position = catch_coords
+                    time.sleep(0.05)
+                    post_catch_loop(window_title)
+                    break
 
-                    rod_coords = find_image_in_window(target_window, "use_rod.png", 0.9)
-                    if rod_coords:
-                        print("Clicking use_rod.png")
-                        time.sleep(1)
-                        click(*rod_coords, hwnd)
-                        time.sleep(1)
+                time.sleep(CHECK_INTERVAL)
 
-                    continue
-
-                time.sleep(0.2)
-                # start fishing once. do not start post-catch until catch_fish appears
-                mouse.click(Button.left, 1)
-                print("Started fishing -> waiting for catch_fish.png")
-                time.sleep(1)
-
-                while macro_running:
-                    catch_coords = find_image_in_window(
-                        target_window, "catch_fish.png", 0.9
-                    )
-                    if catch_coords:
-                        # move mouse to the detected fish position
-                        mouse.position = catch_coords
-                        time.sleep(0.05)
-
-                        # enter post-catch handling which presses and holds,
-                        # checks for continue.png and clicks it reliably
-                        post_catch_loop(target_window, hwnd)
-
-                        # after post_catch_loop returns, break to outer loop
-                        break
-
-                    time.sleep(CHECK_INTERVAL)
-
-            time.sleep(CHECK_INTERVAL)
-    except KeyboardInterrupt:
-        print("Ctrl+C pressed. Running log script...")
-        print("Exiting.")
-        sys.exit()
+        time.sleep(CHECK_INTERVAL)
 
 
 if __name__ == "__main__":

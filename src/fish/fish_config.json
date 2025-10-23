@@ -1,0 +1,74 @@
+{
+    "fishes": [
+        {
+            "image": "astercad.png",
+            "name": "Astercad",
+            "xp": 1,
+            "rarity": "UNCOMMON"
+        },
+        {
+            "image": "ragnus_bighead.png",
+            "name": "Ragnus Bighead",
+            "xp": 2,
+            "rarity": "UNCOMMON"
+        },
+        {
+            "image": "starfish.png",
+            "name": "Starfish",
+            "xp": 5,
+            "rarity": "RARE"
+        },
+        {
+            "image": "stellar_squirrelfish.png",
+            "name": "Stellar Squirrelfish",
+            "xp": 5,
+            "rarity": "RARE"
+        },
+
+
+        {
+            "image": "flaming_grouper.png",
+            "name": "Flaming Grouper",
+            "xp": 1,
+            "rarity": "COMMON"
+        },
+        {
+            "image": "snowy_bighead.png",
+            "name": "Snowy Bighead",
+            "xp": 2,
+            "rarity": "RARE"
+        },
+        {
+            "image": "coral.png",
+            "name": "Coral",
+            "xp": 5,
+            "rarity": "RARE"
+        },
+
+
+        {
+            "image": "astermackere.png",
+            "name": "Astermackere",
+            "xp": 1,
+            "rarity": "COMMON"
+        },
+        {
+            "image": "continental_puffer.png",
+            "name": "Continental Puffer",
+            "xp": 2,
+            "rarity": "COMMON"
+        },
+        {
+            "image": "rockpea.png",
+            "name": "Rockpea",
+            "xp": 3,
+            "rarity": "COMMON"
+        },
+        {
+            "image": "jellyfish.png",
+            "name": "Jellyfish",
+            "xp": 5,
+            "rarity": "RARE"
+        }
+    ]
+}
