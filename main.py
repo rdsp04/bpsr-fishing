@@ -13,6 +13,11 @@ from app_path import get_app_path
 from src.screen_reader.screen_service import ScreenService
 from src.screen_reader.image_service import ImageService
 from src.screen_reader.base import RESOLUTION_FOLDER
+from src.ui.ui_service import start_ui
+import threading
+
+
+
 
 # Services
 screen_service = ScreenService()
@@ -100,12 +105,15 @@ def select_window():
         print("Automatically selected Blue Protocol window.")
         return "Blue Protocol: Star Resonance"
     else:
-        raise Exception("Could not find Blue Protocol window.")
+        print("Could not find Blue Protocol window. Waiting...")
+        return None
+
 
 
 def get_window_rect(title):
     hwnd = win32gui.FindWindow(None, title)
     if not hwnd:
+        print(f"Window '{title}' not found.")
         return None
     return win32gui.GetWindowRect(hwnd)
 
@@ -365,6 +373,18 @@ def main():
         time.sleep(CHECK_INTERVAL)
 
 
+
+def start_macro():
+    main()
+
 if __name__ == "__main__":
     print(get_app_path())
-    main()
+
+    # Run macro in a background thread
+    macro_thread = threading.Thread(target=start_macro, daemon=True)
+    macro_thread.start()
+
+    # Run UI in the main thread
+    start_ui()
+
+
