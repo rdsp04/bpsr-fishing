@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Overlay Window</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: transparent !important;
+        }
+    </style>
+</head>
+
+<body class="text-white !bg-[#111] text-center font-sans w-full h-full relative border !border-gray-700">
+
+    <!-- Full horizontal panel -->
+    <div class="flex items-center bg-black bg-opacity-30 rounded p-2 w-full h-full">
+
+        <!-- Status Indicator + Timer -->
+        <div class="flex flex-col items-center gap-1 border-r !border-gray-700 p-2 h-[80%]">
+            <div id="status-indicator" class="w-4 h-4 rounded-full bg-gray-500 border border-gray-400"></div>
+            <p id="status-text" class="text-xs text-gray-300 m-0">Stopped</p>
+            <p id="fishing-timer" class="text-xs text-gray-200 m-0">00:00:00</p>
+        </div>
+
+        <!-- Stats -->
+        <div
+            class="flex flex-col gap-x-2 border-r text-xs !border-gray-700 p-2 h-[80%] items-start justify-center min-w-[100px]">
+            <div class="flex flex-row w-full justify-between">
+                <label class="text-gray-500">Catches</label>
+                <label id="stat-catches" class="text-gray-300">0</label>
+            </div>
+            <div class="flex flex-row w-full justify-between">
+                <label class="text-gray-500">Misses</label>
+                <label id="stat-misses" class="text-gray-300">0</label>
+            </div>
+            <div class="flex flex-row w-full justify-between">
+                <label class="text-gray-500">XP</label>
+                <label id="stat-xp" class="text-gray-300">0</label>
+            </div>
+            <div class="flex flex-row w-full justify-between">
+                <label class="text-gray-500">Rate</label>
+                <label id="stat-rate" class="text-gray-300">0%</label>
+            </div>
+        </div>
+
+
+        <!-- Buttons -->
+        <div class="flex flex-row gap-x-2 p-2 h-[80%] items-center justify-center">
+            <!-- Start Button -->
+            <button id="start-btn" disabled
+                class="flex flex-col items-center px-2 py-1 hover:bg-[rgba(255,255,255,0.05)] rounded text-xs items-center justify-center">
+                <span>Start</span>
+                <span class="text-[10px] text-gray-200">S</span>
+            </button>
+
+            <!-- Stop Button -->
+            <button id="stop-btn" disabled
+                class="flex flex-col items-center px-2 py-1 hover:bg-[rgba(255,255,255,0.05)] rounded text-xs items-center justify-center">
+                <span>Stop</span>
+                <span class="text-[10px] text-gray-200">X</span>
+            </button>
+        </div>
+
+
+    </div>
+
+    <!-- Minimize / Close Buttons -->
+    <div class="absolute top-1 right-1 flex gap-1">
+        <button id="minimize-btn" class="px-2 py-1 hover:bg-[rgba(255,255,255,0.05)] rounded text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+            </svg>
+        </button>
+        <button id="close-btn" class="px-2 py-1 hover:bg-[rgba(255,255,255,0.05)]  rounded text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    </div>
+    <script>
+        const indicator = document.getElementById('status-indicator');
+        const statusText = document.getElementById('status-text');
+        const timerText = document.getElementById('fishing-timer');
+
+        let fishingStartTime = null;
+        let elapsedTime = 0; // milliseconds already counted
+        let timerInterval = null;
+
+        function setStatus(state) {
+            if (state === 'running') {
+                indicator.className = 'w-4 h-4 rounded-full bg-green-500 border border-green-300';
+                statusText.textContent = 'Running';
+                statusText.className = 'text-xs text-green-300';
+                if (!timerInterval) {
+                    fishingStartTime = new Date();
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+            } else if (state === 'stopped') {
+                indicator.className = 'w-4 h-4 rounded-full bg-red-500 border border-red-300';
+                statusText.textContent = 'Stopped';
+                statusText.className = 'text-xs text-red-300';
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    // Save elapsed time
+                    elapsedTime += new Date() - fishingStartTime;
+                }
+            }
+        }
+
+        function updateTimer() {
+            if (!fishingStartTime) return;
+            const diff = elapsedTime + (new Date() - fishingStartTime);
+            const hours = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            timerText.textContent = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+
+        // Expose a global function for Python to toggle UI state
+        window.toggleBotStatus = function (state) {
+            setStatus(state);
+        };
+
+        // Function for Python to update stats
+        window.updateStats = function (data) {
+            if (data.catches !== undefined)
+                document.getElementById('stat-catches').textContent = data.catches;
+            if (data.misses !== undefined)
+                document.getElementById('stat-misses').textContent = data.misses;
+            if (data.xp !== undefined)
+                document.getElementById('stat-xp').textContent = data.xp;
+            if (data.rate !== undefined)
+                document.getElementById('stat-rate').textContent = data.rate + '%';
+        };
+
+
+        // Button actions
+        document.getElementById('start-btn').onclick = () => {
+            window.pywebview.api.start_bot().then(() => setStatus('running'));
+        };
+
+        document.getElementById('stop-btn').onclick = () => {
+            window.pywebview.api.stop_bot().then(() => setStatus('stopped'));
+        };
+
+        document.getElementById('minimize-btn').onclick = () => {
+            window.pywebview.api.minimize_window();
+        };
+
+        document.getElementById('close-btn').onclick = () => {
+            window.pywebview.api.close_window();
+        };
+
+        window.addEventListener('pywebviewready', async () => {
+            window.pywebview.api.get_start_key().then(key => {
+                const startKeySpan = document.querySelector('#start-btn span:last-child');
+                if (startKeySpan) startKeySpan.textContent = key.toUpperCase();
+            });
+
+            window.pywebview.api.get_stop_key().then(key => {
+                const stopKeySpan = document.querySelector('#stop-btn span:last-child');
+                if (stopKeySpan) stopKeySpan.textContent = key.toUpperCase();
+            });
+        });
+
+
+    </script>
+
+</body>
+
+</html>

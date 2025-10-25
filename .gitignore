@@ -7,6 +7,8 @@ __pycache__/
 *.so
 fishing_log.json
 broken_rods.json
+screenshots
+logs
 
 # Distribution / packaging
 .Python

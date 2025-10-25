@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Fisher Stats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #111;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 0.5rem;
+            text-align: center;
+            border: 1px solid #222;
+        }
+
+        th {
+            background-color: #1a1a1a;
+        }
+
+        td {
+            background-color: #111;
+        }
+
+        select {
+            background-color: #222;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="text-white font-sans p-4">
+
+    <h1 class="text-2xl font-bold mb-4">Fisher Stats</h1>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-4">
+        <button id="tab-daily" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Daily Stats</button>
+        <button id="tab-summary" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Summary</button>
+        <button id="tab-settings" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Settings</button>
+        <button id="btn-refresh" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Refresh</button>
+    </div>
+
+    <!-- Pages -->
+    <div id="page-daily" class="space-y-6 overflow-auto max-h-[80vh]">
+        <div id="daily-tables"></div>
+    </div>
+
+    <div id="page-summary" class="space-y-6 overflow-auto max-h-[80vh] hidden">
+        <div id="summary-tables"></div>
+    </div>
+
+    <div id="page-settings" class="space-y-6 overflow-auto max-h-[80vh] hidden">
+        <h2 class="text-xl font-bold">Settings</h2>
+
+        <div>
+            <label for="resolution">Resolution</label>
+            <select id="resolution">
+                <option value="1920x1080">1920x1080</option>
+                <option value="1600x900" selected>1600x900</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="auto-bait">Auto Bait Purchase</label>
+            <select id="auto-bait" disabled>
+                <option value="T1" selected>T1</option>
+                <option value="T2">T2</option>
+                <option value="T3">T3</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="auto-rods">Auto Rods Purchase</label>
+            <select id="auto-rods" disabled>
+                <option value="T1" selected>T1</option>
+                <option value="T2">T2</option>
+                <option value="T3">T3</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="start-key">Start Keybind</label>
+            <select id="start-key" disabled>
+                <option value="T1" selected>F9</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="stop-key">Stop Keybind</label>
+            <select id="stop-key" disabled>
+                <option value="T1" selected>F10</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        const dailyTab = document.getElementById('tab-daily');
+        const summaryTab = document.getElementById('tab-summary');
+        const settingsTab = document.getElementById('tab-settings');
+        const refreshBtn = document.getElementById('btn-refresh');
+        const dailyPage = document.getElementById('page-daily');
+        const summaryPage = document.getElementById('page-summary');
+        const settingsPage = document.getElementById('page-settings');
+
+        async function loadDaily() {
+            const dailyHtml = await window.pywebview.api.get_daily_table();
+            document.getElementById('daily-tables').innerHTML = dailyHtml;
+        }
+
+        async function loadSummary() {
+            const summaryHtml = await window.pywebview.api.get_overall_summary();
+            document.getElementById('summary-tables').innerHTML = summaryHtml;
+        }
+
+        dailyTab.onclick = async () => {
+            await loadDaily();
+            dailyPage.classList.remove('hidden');
+            summaryPage.classList.add('hidden');
+            settingsPage.classList.add('hidden');
+        };
+
+        summaryTab.onclick = async () => {
+            await loadSummary();
+            dailyPage.classList.add('hidden');
+            summaryPage.classList.remove('hidden');
+            settingsPage.classList.add('hidden');
+        };
+
+        settingsTab.onclick = () => {
+            dailyPage.classList.add('hidden');
+            summaryPage.classList.add('hidden');
+            settingsPage.classList.remove('hidden');
+        };
+
+        // Save settings when changed
+        document.getElementById('resolution').onchange = async (e) => {
+            await window.pywebview.api.set_resolution(e.target.value);
+        };
+        document.getElementById('auto-bait').onchange = async (e) => {
+            await window.pywebview.api.set_auto_bait(e.target.value);
+        };
+        document.getElementById('auto-rods').onchange = async (e) => {
+            await window.pywebview.api.set_auto_rod(e.target.value);
+        };
+
+        // Refresh button
+        refreshBtn.onclick = async () => {
+            await loadDaily();
+            await loadSummary();
+        };
+
+        // Initial load
+        window.addEventListener('pywebviewready', async () => {
+            await loadDaily();
+            await loadSummary();
+
+            // Load current settings values
+            const res = await window.pywebview.api.get_resolution();
+            document.getElementById('resolution').value = res;
+
+            const bait = await window.pywebview.api.get_auto_bait();
+            document.getElementById('auto-bait').value = bait;
+
+            const rod = await window.pywebview.api.get_auto_rod();
+            document.getElementById('auto-rods').value = rod;
+        });
+    </script>
+
+</body>
+
+</html>
