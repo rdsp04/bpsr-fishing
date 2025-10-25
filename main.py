@@ -16,7 +16,7 @@ from src.screen_reader.base import RESOLUTION_FOLDER
 from src.ui.ui_service import start_ui
 import threading
 from log_main import load_sessions, save_sessions
-
+from src.fish.fish_service import FishService
 
 
 # Services
@@ -29,17 +29,26 @@ saved_continue_pos = None
 CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
-
+session_stats = {
+    "catches": 0,
+    "misses": 0,
+    "xp": 0,
+    "rate": 0.0
+}
 from src.utils.keybinds import get_keys, set_keys
+from src.utils.path import get_data_dir
+
 START_KEY, STOP_KEY = get_keys()
+BASE = get_data_dir()
+CONFIG_PATH = BASE / "config/fish_config.json"
 
 mouse = Controller()
 keyboard = KeyboardController()
+fish_service = FishService(CONFIG_PATH)
+fish_service.load_fishes()
 macro_running = False
 
-from src.utils.path import get_data_dir
 
-BASE = get_data_dir()
 # ---------------- Logging ----------------
 def log_broken_rod():
     filename = BASE / "logs" / "broken_rods.json"
@@ -72,6 +81,12 @@ def log_catch(status, **extra):
     data.append(entry)
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
+
+def update_ui_stats():
+    """Send current stats to overlay UI."""
+    overlay = get_window(Window.OVERLAY)
+    if overlay:
+        overlay.evaluate_js(f"window.updateStats({json.dumps(session_stats)})")
 
 
 # ---------------- Input ----------------
@@ -166,6 +181,7 @@ def hold_key(key):
 
 def release_key(key):
     keyboard.release(key)
+
 
 
 # ---------------- Fishing Logic ----------------
@@ -292,7 +308,15 @@ def post_catch_loop(window_title):
                 log_args = {"status": True}
                 if fish_type:
                     log_args["fish_type"] = fish_type
+                    session_stats["xp"] += fish_service.get_xp_by_type(fish_type=fish_type)
+                else:
+                    session_stats["xp"] += 1
                 log_catch(**log_args)
+                session_stats["catches"] += 1
+                total = session_stats["catches"] + session_stats["misses"]
+                session_stats["rate"] = round((session_stats["catches"] / total) * 100, 2) if total > 0 else 0.0
+                update_ui_stats()
+
 
                 # Click saved continue position with retries
                 for attempt in range(3):
@@ -325,6 +349,10 @@ def post_catch_loop(window_title):
                 print("Default screen detected, minigame failed. Releasing click.")
                 mouse.release(Button.left)
                 log_catch(False)
+                session_stats["misses"] += 1
+                total = session_stats["catches"] + session_stats["misses"]
+                session_stats["rate"] = round((session_stats["catches"] / total) * 100, 2) if total > 0 else 0.0
+                update_ui_stats()
                 return
 
 

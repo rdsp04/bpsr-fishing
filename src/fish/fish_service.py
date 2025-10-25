@@ -25,3 +25,10 @@ class FishService:
 
     def get_by_rarity(self, rarity: Rarity):
         return [fish for fish in self.fishes if fish.rarity == rarity]
+
+    def get_xp_by_type(self, fish_type: str) -> int:
+        """Return XP value for a given fish name or ID."""
+        for fish in self.fishes:
+            if fish.name.lower() == fish_type.lower() or fish.id == fish_type:
+                return fish.xp
+        return 0
