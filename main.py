@@ -8,7 +8,8 @@ from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 import pyautogui
 
-from src.utils.updater import check_for_update, download_and_install_update
+from src.utils.updater import check_for_update, download_update, run_update, UpdateApi
+update_api = UpdateApi()
 
 from src.screen_reader.screen_service import ScreenService
 from src.screen_reader.image_service import ImageService
@@ -444,7 +445,7 @@ if __name__ == "__main__":
         update = check_for_update()
         if update:
             print(f"New version available: {update['version']}")
-            download_and_install_update(update)
+            run_update(update)
         else:
             print("App is up to date.")
 

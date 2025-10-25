@@ -1,5 +1,8 @@
 !include "MUI2.nsh"
 !include "nsDialogs.nsh"
+!include "FileFunc.nsh"
+!include "LogicLib.nsh"
+
 
 ;----------------
 ; App Settings
@@ -18,7 +21,7 @@ UninstallIcon "icons/icon.ico"
 Name "${AppName}"
 OutFile "${InstallerFile}"
 InstallDir "$LOCALAPPDATA\${AppName}"
-RequestExecutionLevel admin
+RequestExecutionLevel user
 
 ;----------------
 ; Variables
@@ -33,27 +36,77 @@ Var ProgressLabel
 Var SkipWelcome
 Var SkipLicense
 Var SkipDir
+Var CMD_ARGS
+Var IS_UPDATER
 
+
+!insertmacro GetParameters
 ;----------------
 ; Initialization
 ;----------------
+Function HasSubstring
+  ; $0 = haystack, $1 = needle
+  ; $2 = "1" if found, empty if not
+  Push $3
+  Push $4
+  StrCpy $2 ""
+  StrLen $3 $1
+  loop_hs:
+    StrCpy $4 $0 $3
+    StrCmp $4 $1 found_hs
+    StrLen $5 $0
+    IntCmp $5 0 done_hs
+    StrCpy $0 $0 "" 1
+    Goto loop_hs
+  found_hs:
+    StrCpy $2 1
+  done_hs:
+  Pop $4
+  Pop $3
+FunctionEnd
+
 Function .onInit
+  ; Default flags
+  StrCpy $IS_UPDATER "0"
   StrCpy $isUpdate "0"
- ReadRegStr $R0 HKCU "${UninstallRegKey}" "InstallLocation"
-  StrCmp $R0 "" not_installed 0
-    StrCpy $INSTDIR $R0
+
+  ; Get command-line arguments
+  ${GetParameters} $R0
+
+  ; Check for /UPDATER argument
+  StrCpy $1 "/UPDATER"
+  StrCpy $0 $R0
+  Call HasSubstring
+  StrCmp $2 "1" +2 0
+    StrCpy $IS_UPDATER "1"
+
+  ; Detect existing installation
+  ReadRegStr $R3 HKCU "${UninstallRegKey}" "InstallLocation"
+  StrCmp $R3 "" not_installed 0
+    StrCpy $INSTDIR $R3
     StrCpy $isUpdate "1"
-    Goto done
+    Goto done_init
 not_installed:
     StrCpy $isUpdate "0"
-done:
+done_init:
 
+  ; Skip UI pages if running silent
   ${If} ${Silent}
     StrCpy $SkipWelcome "1"
     StrCpy $SkipLicense "1"
     StrCpy $SkipDir "1"
   ${EndIf}
+
+  ; Control shell context (admin only for full install)
+  ${If} $IS_UPDATER == "1"
+    SetShellVarContext current
+  ${Else}
+    SetShellVarContext all
+  ${EndIf}
 FunctionEnd
+
+
+
 
 
 ;----------------
@@ -185,6 +238,10 @@ Section "Install"
   WriteRegStr HKCU "${UninstallRegKey}" "DisplayName" "${AppName}"
   WriteRegStr HKCU "${UninstallRegKey}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "${UninstallRegKey}" "UninstallString" "$INSTDIR\uninstall.exe"
+
+  ${If} $CMDLINE == "/UPDATER"
+    Exec "$INSTDIR\${AppExecutable}"
+  ${EndIf}
 
 SectionEnd
 
