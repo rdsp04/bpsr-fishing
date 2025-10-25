@@ -12,7 +12,7 @@ from src.utils.updater import check_for_update, download_and_install_update
 
 from src.screen_reader.screen_service import ScreenService
 from src.screen_reader.image_service import ImageService
-from src.screen_reader.base import RESOLUTION_FOLDER
+from src.screen_reader.base import get_resolution_folder
 from src.ui.ui_service import start_ui
 import threading
 from log_main import load_sessions, save_sessions
@@ -202,11 +202,11 @@ def post_catch_loop(window_title):
 
         right_found = image_service.find_image_in_window(
             rect,
-            os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "right.png"),
+            os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "right.png"),
             0.8,
         )
         left_found = image_service.find_image_in_window(
-            rect, os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "left.png"), 0.8
+            rect, os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "left.png"), 0.8
         )
 
         if right_found:
@@ -239,7 +239,7 @@ def post_catch_loop(window_title):
         if time.time() - last_check_time >= 0.3:
             continue_found = image_service.find_image_in_window(
                 rect,
-                os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "continue.png"),
+                os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "continue.png"),
                 0.8,
             )
             if not continue_found:
@@ -247,7 +247,7 @@ def post_catch_loop(window_title):
                     rect,
                     os.path.join(
                         TARGET_IMAGES_FOLDER,
-                        RESOLUTION_FOLDER,
+                        get_resolution_folder(),
                         "continue_highlighted.png",
                     ),
                     0.8,
@@ -255,7 +255,7 @@ def post_catch_loop(window_title):
             default_found = image_service.find_image_in_window(
                 rect,
                 os.path.join(
-                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "default_screen.png"
+                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "default_screen.png"
                 ),
                 0.9,
             )
@@ -269,7 +269,7 @@ def post_catch_loop(window_title):
 
                 # === Fish Detection + Screenshot ===
                 fish_folder = os.path.join(
-                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "fish"
+                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "fish"
                 )
                 fish_type = None
                 screenshot_folder = "screenshots"
@@ -326,7 +326,7 @@ def post_catch_loop(window_title):
                     still_there = image_service.find_image_in_window(
                         rect,
                         os.path.join(
-                            TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "continue.png"
+                            TARGET_IMAGES_FOLDER, get_resolution_folder(), "continue.png"
                         ),
                         0.75,
                     )
@@ -335,7 +335,7 @@ def post_catch_loop(window_title):
                             rect,
                             os.path.join(
                                 TARGET_IMAGES_FOLDER,
-                                RESOLUTION_FOLDER,
+                                get_resolution_folder(),
                                 "continue_highlighted.png",
                             ),
                             0.75,
@@ -374,7 +374,7 @@ def main():
 
         default_found = image_service.find_image_in_window(
             rect,
-            os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "default_screen.png"),
+            os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "default_screen.png"),
             THRESHOLD,
         )
         if default_found:
@@ -385,7 +385,7 @@ def main():
             broken_pole = image_service.find_image_in_window(
                 rect,
                 os.path.join(
-                    TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "broken_pole.png"
+                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "broken_pole.png"
                 ),
                 0.9,
             )
@@ -397,7 +397,7 @@ def main():
                 use_rod = image_service.find_image_in_window(
                     rect,
                     os.path.join(
-                        TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "use_rod.png"
+                        TARGET_IMAGES_FOLDER, get_resolution_folder(), "use_rod.png"
                     ),
                     0.9,
                 )
@@ -415,7 +415,7 @@ def main():
                 catch_coords = image_service.find_image_in_window(
                     rect,
                     os.path.join(
-                        TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "catch_fish.png"
+                        TARGET_IMAGES_FOLDER, get_resolution_folder(), "catch_fish.png"
                     ),
                     0.9,
                 )

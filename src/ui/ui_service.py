@@ -49,7 +49,7 @@ def start_ui():
         y=0
     )
 
-    webview.start(debug=True, http_server=False)
+    webview.start(debug=False, http_server=False)
 
 
 def get_window(window_enum: str):

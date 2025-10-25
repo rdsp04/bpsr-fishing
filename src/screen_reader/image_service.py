@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 from .screen_service import ScreenService
-from .base import RESOLUTION_FOLDER
+from .base import get_resolution_folder
 from src.utils.path import get_data_dir
 
 BASE = get_data_dir()
@@ -11,7 +11,7 @@ class ImageService:
         self.screen_service = ScreenService()
         # Dynamically set image base folder
         self.target_images_folder = os.path.join(BASE, "images")
-        self.resolution_folder = RESOLUTION_FOLDER  # keep existing
+        self.resolution_folder = get_resolution_folder()  # keep existing
 
     def find_image_in_window(self, window_rect, image_path, threshold=0.7):
         """

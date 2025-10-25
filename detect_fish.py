@@ -1,6 +1,6 @@
 import os
 import cv2
-from src.screen_reader.base import RESOLUTION_FOLDER
+from src.screen_reader.base import get_resolution_folder
 
 TARGET_IMAGES_FOLDER = "images"
 
@@ -11,7 +11,7 @@ screenshot_paths = [
     "screenshots/screenshot_astercad_20251023_210232.png"
 ]
 def detect_fish_scores(screenshot_paths):
-    fish_folder = os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "fish")
+    fish_folder = os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "fish")
     if not os.path.exists(fish_folder):
         print(f"Fish folder not found: {fish_folder}")
         return
