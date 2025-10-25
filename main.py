@@ -138,9 +138,13 @@ def focus_blue_protocol_window():
     if hwnd == 0:
         print(f"Window '{target_title}' not found.")
         return None
-    win32gui.ShowWindow(hwnd, 5)
-    win32gui.SetForegroundWindow(hwnd)
+    try:
+        win32gui.ShowWindow(hwnd, 5)
+        win32gui.SetForegroundWindow(hwnd)
+    except Exception as e:
+        print(f"Failed to focus window: {e}")
     return hwnd
+
 
 
 def select_window():
@@ -371,6 +375,7 @@ def main():
             continue
 
         rect = get_window_rect(window_title)
+        pyautogui.screenshot("screenshots/test.png")
 
         default_found = image_service.find_image_in_window(
             rect,
