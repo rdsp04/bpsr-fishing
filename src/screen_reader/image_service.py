@@ -1,12 +1,17 @@
 import cv2
 import numpy as np
-from .screen_service import ScreenService
 import os
-from .base import RESOLUTION_FOLDER, TARGET_IMAGES_FOLDER
+from .screen_service import ScreenService
+from .base import RESOLUTION_FOLDER
+from src.utils.path import get_data_dir
 
+BASE = get_data_dir()
 class ImageService:
     def __init__(self):
         self.screen_service = ScreenService()
+        # Dynamically set image base folder
+        self.target_images_folder = os.path.join(BASE, "images")
+        self.resolution_folder = RESOLUTION_FOLDER  # keep existing
 
     def find_image_in_window(self, window_rect, image_path, threshold=0.7):
         """
@@ -58,7 +63,7 @@ class ImageService:
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
-        fish_folder = os.path.join(TARGET_IMAGES_FOLDER, RESOLUTION_FOLDER, "fish")
+        fish_folder = os.path.join(self.target_images_folder, self.resolution_folder, "fish")
         if not os.path.exists(fish_folder):
             print(f"Fish folder not found: {fish_folder}")
             return None, 0.0

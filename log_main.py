@@ -4,9 +4,28 @@ from collections import defaultdict
 from tabulate import tabulate
 from src.fish.fish_service import FishService  # adjust path if needed
 
-FISH_FILE = "logs/fishing_log.json"
-BROKEN_FILE = "logs/broken_rods.json"
-CONFIG_PATH = "src/fish/fish_config.json"
+from src.utils.path import get_data_dir
+
+BASE = get_data_dir()
+FISH_FILE = BASE / "logs/fishing_log.json"
+BROKEN_FILE = BASE / "logs/broken_rods.json"
+CONFIG_PATH = BASE / "config/fish_config.json"
+SESSIONS_FILE = BASE / "logs/sessions.json"
+
+
+def load_sessions():
+    if SESSIONS_FILE.exists():
+        try:
+            with open(SESSIONS_FILE, "r") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return []
+    return []
+
+def save_sessions(sessions):
+    SESSIONS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(SESSIONS_FILE, "w") as f:
+        json.dump(sessions, f, indent=2, default=str)
 
 
 def load_json(filename):

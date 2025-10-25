@@ -8,14 +8,14 @@ from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 import pyautogui
 
-from app_path import get_app_path
+from src.utils.updater import check_for_update, download_and_install_update
 
 from src.screen_reader.screen_service import ScreenService
 from src.screen_reader.image_service import ImageService
 from src.screen_reader.base import RESOLUTION_FOLDER
 from src.ui.ui_service import start_ui
 import threading
-
+from log_main import load_sessions, save_sessions
 
 
 
@@ -30,16 +30,20 @@ CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 
-START_KEY = KeyCode(char="s")
-STOP_KEY = KeyCode(char="x")
+from src.utils.keybinds import get_keys, set_keys
+START_KEY, STOP_KEY = get_keys()
 
 mouse = Controller()
 keyboard = KeyboardController()
 macro_running = False
 
+from src.utils.path import get_data_dir
 
+BASE = get_data_dir()
 # ---------------- Logging ----------------
-def log_broken_rod(filename="logs/broken_rods.json"):
+def log_broken_rod():
+    filename = BASE / "logs" / "broken_rods.json"
+    filename.parent.mkdir(parents=True, exist_ok=True)
     entry = {"timestamp": datetime.now().isoformat(), "broken": True}
     data = []
     if os.path.exists(filename):
@@ -53,7 +57,9 @@ def log_broken_rod(filename="logs/broken_rods.json"):
         json.dump(data, f, indent=2)
 
 
-def log_catch(status, filename="logs/fishing_log.json", **extra):
+def log_catch(status, **extra):
+    filename = BASE / "logs" / "fishing_log.json"
+    filename.parent.mkdir(parents=True, exist_ok=True)
     entry = {"timestamp": datetime.now().isoformat(), "catch": status}
     entry.update(extra)
     data = []
@@ -69,22 +75,45 @@ def log_catch(status, filename="logs/fishing_log.json", **extra):
 
 
 # ---------------- Input ----------------
-def on_press(key):
-    global macro_running
-    if key == START_KEY:
-        macro_running = True
-        print("Macro started")
-    elif key == STOP_KEY:
-        macro_running = False
-        print("Macro stopped")
-        if getattr(sys, "frozen", False):
-            return
-        try:
-            import log_main
+from src.ui.ui_service import get_window, Window
 
-            log_main.run_summary()
-        except Exception as e:
-            print(f"Failed to run log_main.py: {e}")
+
+def on_press(key):
+    global macro_running, saved_continue_pos, window_title
+    overlay = get_window(Window.OVERLAY)
+    sessions = load_sessions()
+
+    print(key)
+    if key == START_KEY:
+        window_title = select_window()
+        if not window_title:
+            print("No window found. Cannot start macro.")
+            macro_running = False
+            return
+
+        if not sessions or sessions[-1].get("stop") is not None:
+            sessions.append({
+                "start": datetime.now().isoformat(),
+                "stop": None
+            })
+            save_sessions(sessions)
+            overlay.evaluate_js("window.toggleBotStatus('running');")
+            macro_running = True
+            print(f"Macro started on window: {window_title}")
+        else:
+            print("Session already started. Press stop first.")
+
+    elif key == STOP_KEY:
+        if sessions and sessions[-1].get("stop") is None:
+            sessions[-1]["stop"] = datetime.now().isoformat()
+            save_sessions(sessions)
+            macro_running = False
+            saved_continue_pos = None
+            window_title = None
+            print("Macro stopped")
+            overlay.evaluate_js("window.toggleBotStatus('stopped');")
+
+
 
 
 # ---------------- Window Handling ----------------
@@ -303,7 +332,7 @@ def post_catch_loop(window_title):
 def main():
     global macro_running
     window_title = select_window()
-    print(f"Macro waiting for START key ({START_KEY.char})")
+    print(f"Macro waiting for START key ({START_KEY})")
 
     listener = Listener(on_press=on_press)
     listener.start()
@@ -378,13 +407,18 @@ def start_macro():
     main()
 
 if __name__ == "__main__":
-    print(get_app_path())
+    try:
+        update = check_for_update()
+        if update:
+            print(f"New version available: {update['version']}")
+            download_and_install_update(update)
+        else:
+            print("App is up to date.")
 
-    # Run macro in a background thread
-    macro_thread = threading.Thread(target=start_macro, daemon=True)
-    macro_thread.start()
+        macro_thread = threading.Thread(target=start_macro, daemon=True)
+        macro_thread.start()
 
-    # Run UI in the main thread
-    start_ui()
-
-
+        start_ui()
+    finally:
+        print("App is closing, cleaning up...")
+        on_press(STOP_KEY)
