@@ -12,7 +12,7 @@ UninstallIcon "icons/icon.ico"
 
 !define AppName "bpsr-fishing"
 !define AppId "bpsr-fishing"
-!define AppVersion "1.1.1"
+!define AppVersion "1.1.2"
 !define AppExecutable "bpsr-fishing.exe"
 !define InstallerFile "${AppName}_${AppVersion}_x64-Setup.exe"
 !define LicenseFile "LICENSE"
@@ -253,6 +253,7 @@ SectionEnd
 ; Uninstall Section
 ;----------------
 Section "Uninstall"
+    nsExec::ExecToStack 'taskkill /F /IM "${AppExecutable}"'
 
   Delete "$INSTDIR\${AppExecutable}"
   RMDir /r "$INSTDIR\images"
