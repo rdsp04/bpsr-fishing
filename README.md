@@ -9,8 +9,12 @@ Download the latest executable here:
 
 ## Instructions
 
-1. Set the game window to **either 1600x900 or 1920x1080 resolution**.  
-2. Ensure the player character is in a **fishing position** before starting.  
+1. Start Blue Protocol: Star Resonance.
+2. Open BPSR Fishing.
+3. Set the game window to **either 1600x900 or 1920x1080 resolution**. (For 1920x1080 you can use both fullscreen and windowed version)  
+4. Ensure the player character is in a **fishing position** before starting.
+5. Check your amount of baits and rods, if you are not sure about the amount check **Recommendations**.
+6. Now that you are fully ready press F9 and enjoy your exp. 
 
 ## Usage
 
@@ -25,6 +29,7 @@ Download the latest executable here:
 - The game must be placed on the **main monitor**.  
 - The game window must be **visible** for the script to work properly.
 - To open script type **bpsr-fishing** in the windows search.
+- If you are unable to find script, open any folder > go to search bar and type > C:\Users\YourUsername\AppData\Local\bpsr-fishing 
 
 ## Recommendations
 
