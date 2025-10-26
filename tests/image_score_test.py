@@ -10,23 +10,28 @@ BG_FOLDER = "assets/1920x1080/"
 OUTPUT_JSON = "results.json"
 SCALE_RANGE = (1.0, 1.0)
 STEPS = 1
+
+
 # Function to get resolution folder
 def get_resolution_folder():
     return "1920x1080"
+
 
 # --------------------
 # Define which images to use
 # --------------------
 # Background images you want to test
 BG_IMAGES = [
-    "abandoned_billboard_test_1920x1080.png",
-    "abandoned_signboard_test_1920x1080.png",
-    "aluminium_billboard_test_1920x1080.png",
-    "aluminium_signboard_test_1920x1080.png",
-    "artisan_tools_test_1920x1080.png",
-    "astercad_test_1920x1080.png",
-    "astermackere_test_1920x1080.png",
-    "azure_damsel_test_1920x1080.png",
+    # "abandoned_billboard_test_1920x1080.png",
+    # "abandoned_signboard_test_1920x1080.png",
+    # "aluminium_billboard_test_1920x1080.png",
+    # "aluminium_signboard_test_1920x1080.png",
+    # "artisan_tools_test_1920x1080.png",
+    # "astercad_test_1920x1080.png",
+    # "astermackere_test_1920x1080.png",
+    # "azure_damsel_test_1920x1080.png",
+    "regnus_bighead_test_1920x1080.png",
+    "screenshot_20251026_221424.png"
 ]
 
 # Fish images you want to target
@@ -35,13 +40,15 @@ fish_folder = os.path.join(BASE_FOLDER, "images", get_resolution_folder(), "fish
 
 FISH_IMAGES = [
     "abandoned_billboard.png",
-  "abandoned_signboard.png",
+    "abandoned_signboard.png",
     "aluminium_billboard.png",
     "aluminium_signboard.png",
     "artisan_tools.png",
     "astercad.png",
     "astermackere.png",
     "azure_damsel.png",
+    "regnus_bighead.png",
+    "starfish.png",
 ]
 
 # --------------------
@@ -69,24 +76,38 @@ if not fish_templates:
     print("No valid fish templates found.")
     exit(1)
 
+
 # --------------------
 # Template match function
 # --------------------
-def best_template_match(bg_cv, target_img, mask=None, scale_range=(0.5, 1.5), steps=21):
-    best_val = -1
-    best_scale = 1.0
-    for scale in np.linspace(scale_range[0], scale_range[1], steps):
-        h, w = int(target_img.shape[0]*scale), int(target_img.shape[1]*scale)
-        if h < 5 or w < 5:
-            continue
-        scaled_target = cv2.resize(target_img, (w, h))
-        scaled_mask = cv2.resize(mask, (w, h)) if mask is not None else None
-        res = cv2.matchTemplate(bg_cv, scaled_target, cv2.TM_CCOEFF_NORMED, mask=scaled_mask)
+def best_template_match(bg_cv, target_img, mask=None):
+    # Ensure correct data type
+    bg_cv = bg_cv.astype(np.uint8)
+    target_img = target_img.astype(np.uint8)
+
+    # Sanity check for dimensions
+    if bg_cv.shape[0] < target_img.shape[0] or bg_cv.shape[1] < target_img.shape[1]:
+        return 0.0, 1.0
+
+    # Check if background or target is uniform (flat color)
+    if np.std(bg_cv) < 1e-6 or np.std(target_img) < 1e-6:
+        print("Skipped flat image (no variation).")
+        return 0.0, 1.0
+
+    try:
+        res = cv2.matchTemplate(bg_cv, target_img, cv2.TM_CCOEFF_NORMED, mask=mask)
+        if not np.isfinite(res).all():
+            return 0.0, 1.0
+
         _, max_val, _, _ = cv2.minMaxLoc(res)
-        if max_val > best_val:
-            best_val = max_val
-            best_scale = scale
-    return best_val, best_scale
+        if not np.isfinite(max_val):
+            max_val = 0.0
+        return float(max_val), 1.0
+
+    except cv2.error as e:
+        print(f"OpenCV error during matchTemplate: {e}")
+        return 0.0, 1.0
+
 
 # --------------------
 # Run test
@@ -102,16 +123,15 @@ for bg_fname in BG_IMAGES:
         continue
 
     for fish in fish_templates:
-        accuracy, scale = best_template_match(bg_cv, fish["image"], fish["mask"], SCALE_RANGE, STEPS)
+        accuracy, scale = best_template_match(
+            bg_cv, fish["image"], fish["mask"]
+        )
         expected_string = "expected_placeholder"
 
-        results.append([
-            bg_fname,
-            expected_string,
-            fish["name"],
-            float(accuracy)
-        ])
-        print(f"Processed BG: {bg_fname}, Target: {fish['name']}, Accuracy: {accuracy:.3f}, Scale: {scale:.2f}")
+        results.append([bg_fname, expected_string, fish["name"], float(accuracy)])
+        print(
+            f"Processed BG: {bg_fname}, Target: {fish['name']}, Accuracy: {accuracy:.3f}, Scale: {scale:.2f}"
+        )
 
 # --------------------
 # Save results
