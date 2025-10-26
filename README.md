@@ -9,13 +9,15 @@ Download the latest executable here:
 
 ## Instructions
 
-1. Set the game window to **1600x900 resolution**.  
-2. Run the game in **windowed mode**.  
-3. Ensure the player character is in a **fishing position** before starting.  
+1. Set the game window to **either 1600x900 or 1920x1080 resolution**.  
+2. Ensure the player character is in a **fishing position** before starting.  
 
 ## Usage
 
-- Press **S** to start the macro.  
-- Press **X** to pause the macro.
-- Press **Ctrl+C** in the cmd to stop the macro.
+- Press **F9** to start the macro.  
+- Press **F10** to stop the macro.  
+- The script now keeps track of catches, fish types, XP, and sessions.
 
+## Recommendations
+
+- For every hour of fishing, it is recommended to have at least **200 baits** and **10 rods**.
