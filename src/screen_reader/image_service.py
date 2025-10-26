@@ -9,9 +9,8 @@ BASE = get_data_dir()
 class ImageService:
     def __init__(self):
         self.screen_service = ScreenService()
-        # Dynamically set image base folder
         self.target_images_folder = BASE / "images"
-        self.resolution_folder = get_resolution_folder()  # keep existing
+        self.resolution_folder = get_resolution_folder()
 
     def find_image_in_window(self, window_rect, image_path, threshold=0.7):
         """
@@ -64,7 +63,11 @@ class ImageService:
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
+
+
+        self.resolution_folder = get_resolution_folder()
         fish_folder = self.target_images_folder / self.resolution_folder / "fish"
+        print(f"LOOKING FOR FISH IN: {fish_folder}")
         if not os.path.exists(fish_folder):
             print(f"Fish folder not found: {fish_folder}")
             return None, 0.0
