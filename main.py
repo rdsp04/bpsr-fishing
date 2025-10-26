@@ -301,10 +301,14 @@ def post_catch_loop(window_title):
                         if not fname.lower().endswith(".png"):
                             continue
                         fish_type, score = image_service.find_best_matching_fish(rect)
-                        if fish_type:
+                        if fish_type and score >= 0.8:
                             print(
                                 f"Detected fish type: {fish_type} (score: {score:.3f})."
                             )
+                            #screenshot_path = (
+                            #    screenshot_folder / f"screenshot_{timestamp}_{fish_type}_({score:.3f}).png"
+                            #)
+                            #pyautogui.screenshot(screenshot_path)
                             found = True
                             break
                         else:
