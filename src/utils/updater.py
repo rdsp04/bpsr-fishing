@@ -7,8 +7,9 @@ import requests
 import webview
 import ctypes
 
-APP_VERSION = "v1.0.0"
+APP_VERSION = "v1.1.2"
 LATEST_URL = "https://raw.githubusercontent.com/rdsp04/bpsr-fishing/main/latest.json"
+
 
 class UpdateApi:
     def __init__(self):
@@ -23,6 +24,7 @@ class UpdateApi:
         if self.window:
             self.window.evaluate_js(js)
 
+
 def check_for_update():
     """Check latest.json for a newer version"""
     try:
@@ -35,6 +37,7 @@ def check_for_update():
         return None
     return None
 
+
 def download_update(latest, api):
     """Download the update with GUI progress"""
     temp_path = os.path.join(tempfile.gettempdir(), "bpsr_fishing_update.exe")
@@ -45,7 +48,7 @@ def download_update(latest, api):
     total = int(response.headers.get("content-length", 0))
     downloaded = 0
 
-    total_mb = total / (1024*1024)
+    total_mb = total / (1024 * 1024)
 
     with open(temp_path, "wb") as f:
         for chunk in response.iter_content(chunk_size=8192):
@@ -53,14 +56,16 @@ def download_update(latest, api):
                 f.write(chunk)
                 downloaded += len(chunk)
                 percent = int(downloaded / total * 100)
-                downloaded_mb = downloaded / (1024*1024)
+                downloaded_mb = downloaded / (1024 * 1024)
                 api.set_progress(percent, downloaded_mb, total_mb)
 
     # Run installer silently
-    subprocess.Popen([temp_path, "/UPDATER /S "], shell=True)
+    subprocess.Popen([temp_path, "/UPDATER", "/S"], shell=True)
     if api.window:
         api.window.destroy()
     sys.exit(0)
+
+
 def run_update(latest):
     """Show update window and start download"""
     api = UpdateApi()
@@ -136,7 +141,7 @@ def run_update(latest):
         height=window_height,
         resizable=False,
         x=x,
-        y=y
+        y=y,
     )
 
     threading.Thread(target=download_update, args=(latest, api), daemon=True).start()
