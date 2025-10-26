@@ -3,11 +3,23 @@
 
 <head>
     <meta charset="utf-8">
+    <script src="https://kit.fontawesome.com/fc0cae2ea4.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap" rel="stylesheet">
     <title>Fisher Stats</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+
+        @font-face {
+        font-family: 'Lexand';
+        src: url('./font/LexendDeca-VariableFont_wght.ttf') format('truetype');
+        }
+
         body {
             background-color: #111;
+            font-family: 'Viga', sans-serif !important;
         }
 
         table {
@@ -35,7 +47,7 @@
             color: white;
             padding: 0.25rem 0.5rem;
             border-radius: 0.25rem;
-            border: 1px solid #333;
+            
         }
 
         label {
@@ -47,19 +59,31 @@
         button {
             cursor: pointer;
         }
+
+        @keyframes bounce {
+        0%, 100% {
+        transform: translateY(-50%);
+        animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+        }
+        50% {
+        transform: none;
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        }
+        }
+
     </style>
 </head>
 
 <body class="text-white font-sans p-4">
 
-    <h1 class="text-2xl font-bold mb-4">Fisher Stats</h1>
+    <h1 class="text-2xl font-bold text-center mb-4">BPSR FISHING</h1>
 
     <!-- Tabs -->
-    <div class="flex gap-2 mb-4">
-        <button id="tab-daily" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Daily Stats</button>
-        <button id="tab-summary" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Summary</button>
-        <button id="tab-settings" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Settings</button>
-        <button id="btn-refresh" class="px-4 py-2 bg-gray-800 rounded hover:bg-gray-700">Refresh</button>
+    <div class="flex gap-2 mb-4 place-content-center font-bold text-xl">
+        <button id="tab-daily" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-scroll"></i> Daily Stats</button>
+        <button id="tab-summary" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-fish-fins"></i> Summary</button>
+        <button id="tab-settings" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-gears"></i> Settings</button>
+        <button id="btn-refresh" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-bug"></i> Refresh</button>
     </div>
 
     <!-- Pages -->
@@ -72,7 +96,8 @@
     </div>
 
     <div id="page-settings" class="space-y-6 overflow-auto max-h-[80vh] hidden">
-        <h2 class="text-xl font-bold">Settings</h2>
+
+        <h2 class="text-xl font-bold">Display</h2>
 
         <div>
             <label for="resolution">Resolution</label>
@@ -81,6 +106,10 @@
                 <option value="1600x900" selected>1600x900</option>
             </select>
         </div>
+
+        <h2 class="text-xl font-bold">Preferences</h2>
+        <br>
+        <span class="text-sm px-1.5 py-1 bg-red-600 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i> Coming Soon <i class="fa-solid fa-triangle-exclamation"></i></span>
 
         <div>
             <label for="auto-bait">Auto Bait Purchase</label>
