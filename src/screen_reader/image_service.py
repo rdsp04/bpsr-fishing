@@ -9,9 +9,8 @@ BASE = get_data_dir()
 class ImageService:
     def __init__(self):
         self.screen_service = ScreenService()
-        # Dynamically set image base folder
-        self.target_images_folder = os.path.join(BASE, "images")
-        self.resolution_folder = get_resolution_folder()  # keep existing
+        self.target_images_folder = BASE / "images"
+        self.resolution_folder = get_resolution_folder()
 
     def find_image_in_window(self, window_rect, image_path, threshold=0.7):
         """
@@ -31,6 +30,7 @@ class ImageService:
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
+        print(image_path)
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         if template is None:
             print(f"Template not found: {image_path}")
@@ -63,7 +63,11 @@ class ImageService:
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
-        fish_folder = os.path.join(self.target_images_folder, self.resolution_folder, "fish")
+
+
+        self.resolution_folder = get_resolution_folder()
+        fish_folder = self.target_images_folder / self.resolution_folder / "fish"
+        print(f"LOOKING FOR FISH IN: {fish_folder}")
         if not os.path.exists(fish_folder):
             print(f"Fish folder not found: {fish_folder}")
             return None, 0.0
@@ -75,7 +79,7 @@ class ImageService:
             if not fname.lower().endswith(".png"):
                 continue
             fish_name = os.path.splitext(fname)[0]
-            template_path = os.path.join(fish_folder, fname)
+            template_path = fish_folder / fname
             template = cv2.imread(template_path, cv2.IMREAD_GRAYSCALE)
             if template is None:
                 continue

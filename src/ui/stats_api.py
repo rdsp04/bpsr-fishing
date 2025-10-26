@@ -11,7 +11,7 @@ FISH_FILE = BASE / "logs/fishing_log.json"
 BROKEN_FILE = BASE / "logs/broken_rods.json"
 CONFIG_PATH = BASE / "config/fish_config.json"
 DEFAULT_SETTINGS = {
-    "resolution": "1600x900",
+    "resolution": "1920x1080",
     "auto_bait_purchase": "T1",
     "auto_rods_purchase": "T1",
 }
