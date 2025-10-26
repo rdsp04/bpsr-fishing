@@ -35,7 +35,7 @@ fish_folder = os.path.join(BASE_FOLDER, "images", get_resolution_folder(), "fish
 
 FISH_IMAGES = [
     "abandoned_billboard.png",
-    "abandoned_signboard.png",
+  "abandoned_signboard.png",
     "aluminium_billboard.png",
     "aluminium_signboard.png",
     "artisan_tools.png",
