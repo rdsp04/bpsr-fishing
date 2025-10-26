@@ -29,7 +29,7 @@ Download the latest executable here:
 - The game must be placed on the **main monitor**.  
 - The game window must be **visible** for the script to work properly.
 - To open script type **bpsr-fishing** in the windows search.
-  If you are unable to find script, open any folder > go to search bar and type > C:\Users\YourUsername\AppData\Local\bpsr-fishing 
+- If you are unable to find script, open any folder > go to search bar and type > C:\Users\YourUsername\AppData\Local\bpsr-fishing 
 
 ## Recommendations
 
