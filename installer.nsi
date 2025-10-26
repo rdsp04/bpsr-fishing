@@ -31,19 +31,51 @@ Var StartMenuCheckbox
 Var DesktopCheckbox
 Var CreateStartMenu
 Var CreateDesktop
-Var ProgressBar
-Var ProgressLabel
 Var SkipWelcome
 Var SkipLicense
 Var SkipDir
-Var CMD_ARGS
 Var IS_UPDATER
-VAR UpdaterMode
 
 !insertmacro GetParameters
 ;----------------
 ; Initialization
 ;----------------
+Function CreateSelectedShortcuts
+  SetShellVarContext current
+
+  StrCmp $CreateStartMenu ${BST_CHECKED} 0 +3
+    CreateDirectory "$SMPROGRAMS\${AppName}"
+    CreateShortcut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\${AppExecutable}" "" "$INSTDIR\icons\icon.ico"
+
+  StrCmp $CreateDesktop ${BST_CHECKED} 0 +3
+    CreateShortcut "$DESKTOP\${AppName}.lnk" "$INSTDIR\${AppExecutable}" "" "$INSTDIR\icons\icon.ico"
+FunctionEnd
+
+
+Function PageFinishShortcuts
+  nsDialogs::Create 1018
+  Pop $0
+
+  ${NSD_CreateLabel} 12u 10u 100% 12u "Create shortcuts"
+  Pop $R0
+
+  ${NSD_CreateCheckBox} 20u 30u 100% 12u "Create Start Menu shortcut"
+  Pop $StartMenuCheckbox
+  ${NSD_SetState} $StartMenuCheckbox ${BST_CHECKED}
+
+  ${NSD_CreateCheckBox} 20u 50u 100% 12u "Create Desktop shortcut"
+  Pop $DesktopCheckbox
+  ${NSD_SetState} $DesktopCheckbox ${BST_CHECKED}
+
+  nsDialogs::Show
+FunctionEnd
+
+Function PageLeaveFinishShortcuts
+  ${NSD_GetState} $StartMenuCheckbox $CreateStartMenu
+  ${NSD_GetState} $DesktopCheckbox $CreateDesktop
+  Call CreateSelectedShortcuts
+FunctionEnd
+
 Function HasSubstring
   ; $0 = haystack, $1 = needle
   ; $2 = "1" if found, empty if not
@@ -108,32 +140,6 @@ done_init:
 FunctionEnd
 
 
-
-
-
-;----------------
-; Custom Pages
-;----------------
-Function PageSelectShortcuts
-  nsDialogs::Create 1018
-  Pop $0
-
-  ${NSD_CreateCheckBox} 20u 20u 100% 12u "Create Start Menu Shortcut"
-  Pop $StartMenuCheckbox
-  ${NSD_SetState} $StartMenuCheckbox ${BST_CHECKED}
-
-  ${NSD_CreateCheckBox} 20u 40u 100% 12u "Create Desktop Shortcut"
-  Pop $DesktopCheckbox
-  ${NSD_SetState} $DesktopCheckbox ${BST_CHECKED}
-
-  nsDialogs::Show
-FunctionEnd
-
-Function PageLeaveShortcuts
-  ${NSD_GetState} $StartMenuCheckbox $CreateStartMenu
-  ${NSD_GetState} $DesktopCheckbox $CreateDesktop
-FunctionEnd
-
 Function SkipDirPage
   ${If} $isUpdate == "1"
     Abort
@@ -141,47 +147,20 @@ Function SkipDirPage
 FunctionEnd
 
 ;----------------
-; Updating Page
-;----------------
-Function PageUpdate
-  nsDialogs::Create 1018
-  Pop $0
-
-  ${NSD_CreateLabel} 0u 10u 100% 12u "Updating ${AppName}..."
-  Pop $ProgressLabel
-
-  ${NSD_CreateProgressBar} 0u 30u 100% 12u
-  Pop $ProgressBar
-  SendMessage $ProgressBar ${PBM_SETRANGE} 0 100
-  SendMessage $ProgressBar ${PBM_SETPOS} 0 0
-
-  nsDialogs::Show
-FunctionEnd
-
-Function SkipUpdatePage
-  ${If} $isUpdate == "0"
-    Abort
-  ${EndIf}
-FunctionEnd
-Function PreShowUpdate
-  ${If} $isUpdate == "0"
-    Abort
-  ${EndIf}
-FunctionEnd
-;----------------
 ; Page Sequence
 ;----------------
 !define MUI_ICON "icons/icon.ico"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${LicenseFile}"
-Page custom PageSelectShortcuts PageLeaveShortcuts
-PageEx custom
-  PageCallbacks PreShowUpdate
-PageExEnd
 PageEx directory
   PageCallbacks SkipDirPage
 PageExEnd
 !insertmacro MUI_PAGE_INSTFILES
+Page custom PageFinishShortcuts PageLeaveFinishShortcuts
+!define MUI_FINISHPAGE_RUN "$INSTDIR\${AppExecutable}"
+!define MUI_FINISHPAGE_RUN_TEXT "Run ${AppName}"
+!define MUI_FINISHPAGE_RUN_CHECKED
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION CreateSelectedShortcuts
 !insertmacro MUI_PAGE_FINISH
 
 
@@ -218,23 +197,6 @@ Section "Install"
   File /r "icons"
 
 
-  ; Shortcuts (only on fresh install)
-  ${If} $isUpdate == "0"
-    ${If} $CreateStartMenu = ${BST_CHECKED}
-      CreateDirectory "$SMPROGRAMS\${AppName}"
-      CreateShortCut "$SMPROGRAMS\${AppName}\${AppName}.lnk" "$INSTDIR\${AppExecutable}" "" "$INSTDIR\icons\icon.ico"
-    ${EndIf}
-
-    ${If} $CreateDesktop = ${BST_CHECKED}
-      CreateShortCut "$DESKTOP\${AppName}.lnk" "$INSTDIR\${AppExecutable}" "" "$INSTDIR\icons\icon.ico"
-    ${EndIf}
-  ${EndIf}
-
-  ; Show progress bar incrementally (example)
-  SendMessage $ProgressBar ${PBM_SETPOS} 50 0
-  Sleep 500
-  SendMessage $ProgressBar ${PBM_SETPOS} 100 0
-
   WriteUninstaller "$INSTDIR\uninstall.exe"
 
   ; Registry info
@@ -255,21 +217,25 @@ SectionEnd
 Section "Uninstall"
     nsExec::ExecToStack 'taskkill /F /IM "${AppExecutable}"'
 
-  Delete "$INSTDIR\${AppExecutable}"
-  RMDir /r "$INSTDIR\images"
-  RMDir /r "$INSTDIR\config"
-  RMDir /r "$INSTDIR\html"
-  RMDir /r "$INSTDIR\logs"
-  RMDir /r "$INSTDIR\screenshots"
+    ; Delete main executable and folders
+    Delete "$INSTDIR\${AppExecutable}"
+    RMDir /r "$INSTDIR\images"
+    RMDir /r "$INSTDIR\config"
+    RMDir /r "$INSTDIR\html"
+    RMDir /r "$INSTDIR\logs"
+    RMDir /r "$INSTDIR\screenshots"
 
-  Delete "$SMPROGRAMS\${AppName}\${AppName}.lnk"
-  RMDir "$SMPROGRAMS\${AppName}"
+    ; Remove Start Menu shortcut and folder
+    Delete "$SMPROGRAMS\${AppName}\${AppName}.lnk"
+    RMDir "$SMPROGRAMS\${AppName}"
 
-  Delete "$DESKTOP\${AppName}.lnk"
+    ; Remove Desktop shortcut
+    Delete "$DESKTOP\${AppName}.lnk"
 
-  Delete "$INSTDIR\uninstall.exe"
-  RMDir /r /REBOOTOK "$INSTDIR"
+    ; Remove uninstaller
+    Delete "$INSTDIR\uninstall.exe"
+    RMDir /r /REBOOTOK "$INSTDIR"
 
-  DeleteRegKey HKCU "${UninstallRegKey}"
-
+    ; Remove registry key
+    DeleteRegKey HKCU "${UninstallRegKey}"
 SectionEnd
