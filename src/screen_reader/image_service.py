@@ -47,7 +47,7 @@ class ImageService:
 
         return None
 
-    def find_best_matching_fish(self, window_rect, show_crop=True):
+    def find_best_matching_fish(self, window_rect):
         """
         Returns the fish name with the highest score and the score itself.
         Searches only in a specific bottom-left region:
@@ -78,17 +78,6 @@ class ImageService:
 
         img_gray_crop = img_gray[crop_y1:crop_y2, crop_x1:crop_x2]
 
-        if show_crop:
-            # Draw the crop rectangle on a copy of the screenshot
-            img_show = img_rgb.copy()
-            cv2.rectangle(
-                img_show, (crop_x1, crop_y1), (crop_x2, crop_y2), (0, 255, 0), 2
-            )
-            cv2.imshow("Debug Crop Area", img_show)
-            print(f"Showing crop: ({crop_x1},{crop_y1}) -> ({crop_x2},{crop_y2})")
-            cv2.waitKey(0)  # Wait until you press a key
-            cv2.destroyWindow("Debug Crop Area")
-
         self.resolution_folder = get_resolution_folder()
         fish_folder = self.target_images_folder / self.resolution_folder / "fish"
         if not os.path.exists(fish_folder):
@@ -96,7 +85,6 @@ class ImageService:
 
         best_fish = None
         best_score = 0.0
-        best_coords = None
 
         for fname in os.listdir(fish_folder):
             if not fname.lower().endswith(".png"):
@@ -132,6 +120,5 @@ class ImageService:
             if max_val > best_score:
                 best_score = max_val
                 best_fish = fish_name
-                best_coords = (x1 + crop_x1 + max_loc[0], y1 + crop_y1 + max_loc[1])
 
         return best_fish, best_score
