@@ -22,7 +22,7 @@ Download the latest executable here:
 
 - If the script presses the **Exit** button instead of **Continue**, restart the script.  
 - The script must be launched **after the game is opened**.  
-- The script must be placed on the **main monitor**.  
+- The game must be placed on the **main monitor**.  
 - The game window must be **visible** for the script to work properly.
 
 ## Recommendations
