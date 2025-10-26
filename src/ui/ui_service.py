@@ -45,6 +45,8 @@ def start_ui():
         frameless=True,
         transparent=True,
         on_top=True,
+        x=0,
+        y=0
     )
 
     webview.start(debug=False, http_server=False)
