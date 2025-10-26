@@ -9,6 +9,7 @@ from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
 import pyautogui
 
 from src.utils.updater import check_for_update, download_update, run_update, UpdateApi
+
 update_api = UpdateApi()
 
 from src.screen_reader.screen_service import ScreenService
@@ -30,18 +31,14 @@ saved_continue_pos = None
 CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
-session_stats = {
-    "catches": 0,
-    "misses": 0,
-    "xp": 0,
-    "rate": 0.0
-}
+session_stats = {"catches": 0, "misses": 0, "xp": 0, "rate": 0.0}
 from src.utils.keybinds import get_keys, set_keys
 from src.utils.path import get_data_dir
 
 START_KEY, STOP_KEY = get_keys()
 BASE = get_data_dir()
 CONFIG_PATH = BASE / "config/fish_config.json"
+
 
 mouse = Controller()
 keyboard = KeyboardController()
@@ -83,6 +80,7 @@ def log_catch(status, **extra):
     with open(filename, "w") as f:
         json.dump(data, f, indent=2)
 
+
 def update_ui_stats():
     """Send current stats to overlay UI."""
     overlay = get_window(Window.OVERLAY)
@@ -108,10 +106,7 @@ def on_press(key):
             return
 
         if not sessions or sessions[-1].get("stop") is not None:
-            sessions.append({
-                "start": datetime.now().isoformat(),
-                "stop": None
-            })
+            sessions.append({"start": datetime.now().isoformat(), "stop": None})
             save_sessions(sessions)
             overlay.evaluate_js("window.toggleBotStatus('running');")
             macro_running = True
@@ -130,8 +125,6 @@ def on_press(key):
             overlay.evaluate_js("window.toggleBotStatus('stopped');")
 
 
-
-
 # ---------------- Window Handling ----------------
 def focus_blue_protocol_window():
     target_title = "Blue Protocol: Star Resonance"
@@ -147,7 +140,6 @@ def focus_blue_protocol_window():
     return hwnd
 
 
-
 def select_window():
     hwnd = focus_blue_protocol_window()
     if hwnd:
@@ -156,7 +148,6 @@ def select_window():
     else:
         print("Could not find Blue Protocol window. Waiting...")
         return None
-
 
 
 def get_window_rect(title):
@@ -188,7 +179,6 @@ def release_key(key):
     keyboard.release(key)
 
 
-
 # ---------------- Fishing Logic ----------------
 def post_catch_loop(window_title):
     global macro_running, saved_continue_pos
@@ -207,11 +197,23 @@ def post_catch_loop(window_title):
 
         right_found = image_service.find_image_in_window(
             rect,
-            os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "right.png"),
+            (
+                get_data_dir()
+                / TARGET_IMAGES_FOLDER
+                / get_resolution_folder()
+                / "right.png"
+            ),
             0.8,
         )
         left_found = image_service.find_image_in_window(
-            rect, os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "left.png"), 0.8
+            rect,
+            (
+                get_data_dir()
+                / TARGET_IMAGES_FOLDER
+                / get_resolution_folder()
+                / "left.png"
+            ),
+            0.8,
         )
 
         if right_found:
@@ -244,23 +246,32 @@ def post_catch_loop(window_title):
         if time.time() - last_check_time >= 0.3:
             continue_found = image_service.find_image_in_window(
                 rect,
-                os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "continue.png"),
+                (
+                    get_data_dir()
+                    / TARGET_IMAGES_FOLDER
+                    / get_resolution_folder()
+                    / "continue.png"
+                ),
                 0.8,
             )
             if not continue_found:
                 continue_found = image_service.find_image_in_window(
                     rect,
-                    os.path.join(
-                        TARGET_IMAGES_FOLDER,
-                        get_resolution_folder(),
-                        "continue_highlighted.png",
+                    (
+                        get_data_dir()
+                        / TARGET_IMAGES_FOLDER
+                        / get_resolution_folder()
+                        / "continue_highlighted.png"
                     ),
                     0.8,
                 )
             default_found = image_service.find_image_in_window(
                 rect,
-                os.path.join(
-                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "default_screen.png"
+                (
+                    get_data_dir()
+                    / TARGET_IMAGES_FOLDER
+                    / get_resolution_folder()
+                    / "default_screen.png"
                 ),
                 0.9,
             )
@@ -273,12 +284,15 @@ def post_catch_loop(window_title):
                 mouse.release(Button.left)
 
                 # === Fish Detection + Screenshot ===
-                fish_folder = os.path.join(
-                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "fish"
+                fish_folder = (
+                    get_data_dir()
+                    / TARGET_IMAGES_FOLDER
+                    / get_resolution_folder()
+                    / "fish"
                 )
                 fish_type = None
-                screenshot_folder = "screenshots"
-                os.makedirs(screenshot_folder, exist_ok=True)
+                screenshot_folder = BASE / "screenshots"
+                screenshot_folder.mkdir(parents=True, exist_ok=True)
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
                 if os.path.exists(fish_folder):
@@ -288,40 +302,51 @@ def post_catch_loop(window_title):
                             continue
                         fish_type, score = image_service.find_best_matching_fish(rect)
                         if fish_type:
-                            print(f"Detected fish type: {fish_type} (score: {score:.3f}).")
+                            print(
+                                f"Detected fish type: {fish_type} (score: {score:.3f})."
+                            )
                             found = True
                             break
                         else:
-                            screenshot_path = os.path.join(screenshot_folder, f"screenshot_{timestamp}.png")
+                            screenshot_path = (
+                                screenshot_folder / f"screenshot_{timestamp}.png"
+                            )
                             pyautogui.screenshot(screenshot_path)
-                            print(f"No fish detected. Screenshot saved: {screenshot_path}")
+                            print(
+                                f"No fish detected. Screenshot saved: {screenshot_path}"
+                            )
 
                     if not found:
-                        screenshot_path = os.path.join(
-                            screenshot_folder, f"screenshot_{timestamp}.png"
+                        screenshot_path = (
+                            screenshot_folder / f"screenshot_{timestamp}.png"
                         )
+
                         pyautogui.screenshot(screenshot_path)
                         print(f"No fish detected. Screenshot saved: {screenshot_path}")
                 else:
                     print("Fish folder not found, taking default screenshot")
-                    screenshot_path = os.path.join(
-                        screenshot_folder, f"screenshot_{timestamp}.png"
-                    )
+                    screenshot_path = screenshot_folder / f"screenshot_{timestamp}.png"
+
                     pyautogui.screenshot(screenshot_path)
 
                 # Logging
                 log_args = {"status": True}
                 if fish_type:
                     log_args["fish_type"] = fish_type
-                    session_stats["xp"] += fish_service.get_xp_by_type(fish_type=fish_type)
+                    session_stats["xp"] += fish_service.get_xp_by_type(
+                        fish_type=fish_type
+                    )
                 else:
                     session_stats["xp"] += 1
                 log_catch(**log_args)
                 session_stats["catches"] += 1
                 total = session_stats["catches"] + session_stats["misses"]
-                session_stats["rate"] = round((session_stats["catches"] / total) * 100, 2) if total > 0 else 0.0
+                session_stats["rate"] = (
+                    round((session_stats["catches"] / total) * 100, 2)
+                    if total > 0
+                    else 0.0
+                )
                 update_ui_stats()
-
 
                 # Click saved continue position with retries
                 for attempt in range(3):
@@ -330,18 +355,22 @@ def post_catch_loop(window_title):
                         time.sleep(0.5)
                     still_there = image_service.find_image_in_window(
                         rect,
-                        os.path.join(
-                            TARGET_IMAGES_FOLDER, get_resolution_folder(), "continue.png"
+                        (
+                            get_data_dir()
+                            / TARGET_IMAGES_FOLDER
+                            / get_resolution_folder()
+                            / "continue.png"
                         ),
                         0.75,
                     )
                     if not still_there:
                         still_there = image_service.find_image_in_window(
                             rect,
-                            os.path.join(
-                                TARGET_IMAGES_FOLDER,
-                                get_resolution_folder(),
-                                "continue_highlighted.png",
+                            (
+                                get_data_dir()
+                                / TARGET_IMAGES_FOLDER
+                                / get_resolution_folder()
+                                / "continue_highlighted.png"
                             ),
                             0.75,
                         )
@@ -356,7 +385,11 @@ def post_catch_loop(window_title):
                 log_catch(False)
                 session_stats["misses"] += 1
                 total = session_stats["catches"] + session_stats["misses"]
-                session_stats["rate"] = round((session_stats["catches"] / total) * 100, 2) if total > 0 else 0.0
+                session_stats["rate"] = (
+                    round((session_stats["catches"] / total) * 100, 2)
+                    if total > 0
+                    else 0.0
+                )
                 update_ui_stats()
                 return
 
@@ -376,11 +409,15 @@ def main():
             continue
 
         rect = get_window_rect(window_title)
-        pyautogui.screenshot("screenshots/test.png")
 
         default_found = image_service.find_image_in_window(
             rect,
-            os.path.join(TARGET_IMAGES_FOLDER, get_resolution_folder(), "default_screen.png"),
+            (
+                get_data_dir()
+                / TARGET_IMAGES_FOLDER
+                / get_resolution_folder()
+                / "default_screen.png"
+            ),
             THRESHOLD,
         )
         if default_found:
@@ -390,8 +427,11 @@ def main():
             # Broken rod handling
             broken_pole = image_service.find_image_in_window(
                 rect,
-                os.path.join(
-                    TARGET_IMAGES_FOLDER, get_resolution_folder(), "broken_pole.png"
+                (
+                    get_data_dir()
+                    / TARGET_IMAGES_FOLDER
+                    / get_resolution_folder()
+                    / "broken_pole.png"
                 ),
                 0.9,
             )
@@ -402,8 +442,11 @@ def main():
                 time.sleep(0.2)
                 use_rod = image_service.find_image_in_window(
                     rect,
-                    os.path.join(
-                        TARGET_IMAGES_FOLDER, get_resolution_folder(), "use_rod.png"
+                    (
+                        get_data_dir()
+                        / TARGET_IMAGES_FOLDER
+                        / get_resolution_folder()
+                        / "use_rod.png"
                     ),
                     0.9,
                 )
@@ -420,8 +463,11 @@ def main():
             while macro_running:
                 catch_coords = image_service.find_image_in_window(
                     rect,
-                    os.path.join(
-                        TARGET_IMAGES_FOLDER, get_resolution_folder(), "catch_fish.png"
+                    (
+                        get_data_dir()
+                        / TARGET_IMAGES_FOLDER
+                        / get_resolution_folder()
+                        / "catch_fish.png"
                     ),
                     0.9,
                 )
@@ -436,9 +482,9 @@ def main():
         time.sleep(CHECK_INTERVAL)
 
 
-
 def start_macro():
     main()
+
 
 if __name__ == "__main__":
     try:
