@@ -18,6 +18,13 @@ Download the latest executable here:
 - Press **F10** to stop the macro.  
 - The script now keeps track of catches, fish types, XP, and sessions.
 
+## FAQ
+
+- If the script presses the **Exit** button instead of **Continue**, restart the game and script.  
+- The script must be launched **after the game is opened**.  
+- The script must be placed on the **main monitor**.  
+- The game window must be **visible** for the script to work properly.
+
 ## Recommendations
 
 - For every hour of fishing, it is recommended to have at least **200 baits** and **10 rods**.
