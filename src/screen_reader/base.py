@@ -6,7 +6,7 @@ BASE = get_data_dir()
 SETTINGS_FILE = BASE / "config/settings.json"
 
 DEFAULT_SETTINGS = {
-    "resolution": "1600x900",
+    "resolution": "1920x1080",
     "auto_bait_purchase": "T1",
     "auto_rods_purchase": "T1",
     "start_key": "T9",
