@@ -38,7 +38,7 @@ Var SkipLicense
 Var SkipDir
 Var CMD_ARGS
 Var IS_UPDATER
-
+VAR UpdaterMode
 
 !insertmacro GetParameters
 ;----------------
@@ -66,6 +66,8 @@ Function HasSubstring
 FunctionEnd
 
 Function .onInit
+
+
   ; Default flags
   StrCpy $IS_UPDATER "0"
   StrCpy $isUpdate "0"
@@ -98,7 +100,7 @@ done_init:
   ${EndIf}
 
   ; Control shell context (admin only for full install)
-  ${If} $IS_UPDATER == "1"
+  ${If} $IS_UPDATER == "0"
     SetShellVarContext current
   ${Else}
     SetShellVarContext all
@@ -193,6 +195,7 @@ PageExEnd
 ; Installation Section
 ;----------------
 Section "Install"
+    nsExec::ExecToStack 'taskkill /F /IM "${AppExecutable}"'
 
   SetOutPath "$INSTDIR"
 
@@ -239,10 +242,11 @@ Section "Install"
   WriteRegStr HKCU "${UninstallRegKey}" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "${UninstallRegKey}" "UninstallString" "$INSTDIR\uninstall.exe"
 
-  ${If} $CMDLINE == "/UPDATER"
-    Exec "$INSTDIR\${AppExecutable}"
-  ${EndIf}
+  ${If} $IS_UPDATER == "0"
 
+
+    nsExec::ExecToLog 'cmd /C start "" "$INSTDIR\${AppExecutable}"'
+  ${EndIf}
 SectionEnd
 
 ;----------------

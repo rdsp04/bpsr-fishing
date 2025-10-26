@@ -5,6 +5,7 @@ import subprocess
 import threading
 import requests
 import webview
+import ctypes
 
 APP_VERSION = "v1.0.0"
 LATEST_URL = "https://raw.githubusercontent.com/rdsp04/bpsr-fishing/main/latest.json"
@@ -56,11 +57,10 @@ def download_update(latest, api):
                 api.set_progress(percent, downloaded_mb, total_mb)
 
     # Run installer silently
-    subprocess.Popen([temp_path, "/S /UPDATE"], shell=True)
+    subprocess.Popen([temp_path, "/UPDATER /S "], shell=True)
     if api.window:
         api.window.destroy()
     sys.exit(0)
-
 def run_update(latest):
     """Show update window and start download"""
     api = UpdateApi()
@@ -70,11 +70,44 @@ def run_update(latest):
       <head>
         <meta charset="utf-8">
         <title>Updating</title>
+        <style>
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+          }
+          h3 {
+            margin-bottom: 20px;
+            color: #333;
+          }
+          #progress-container {
+            width: 80%;
+            height: 30px;
+            margin: auto;
+            background-color: #ddd;
+            border-radius: 15px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+          }
+          #bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            border-radius: 15px;
+            transition: width 0.2s;
+          }
+          #percent {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+          }
+        </style>
       </head>
-      <body style="font-family:sans-serif;text-align:center;">
+      <body>
         <h3>Updating...</h3>
-        <div style="width:80%;margin:auto;border:1px solid #ccc;height:25px;border-radius:5px;">
-          <div id="bar" style="height:100%;width:0%;background-color:green;border-radius:5px;"></div>
+        <div id="progress-container">
+          <div id="bar"></div>
         </div>
         <p id="percent">0%</p>
       </body>
@@ -86,10 +119,29 @@ def run_update(latest):
       </script>
     </html>
     """
-    api.window = webview.create_window("Updating...", html=html, width=400, height=150, resizable=False)
+    # Center window on screen
+    user32 = ctypes.windll.user32
+    screen_width = user32.GetSystemMetrics(0)
+    screen_height = user32.GetSystemMetrics(1)
+
+    window_width = 400
+    window_height = 250
+    x = int((screen_width - window_width) / 2)
+    y = int((screen_height - window_height) / 2)
+
+    api.window = webview.create_window(
+        "Updating...",
+        html=html,
+        width=window_width,
+        height=window_height,
+        resizable=False,
+        x=x,
+        y=y
+    )
 
     threading.Thread(target=download_update, args=(latest, api), daemon=True).start()
     webview.start(debug=False)
+
 
 if __name__ == "__main__":
     latest = check_for_update()
