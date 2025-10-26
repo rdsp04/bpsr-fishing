@@ -1,81 +1,276 @@
 {
-    "fishes": [
-        {
-            "id": "astercad",
-            "image": "astercad.png",
-            "name": "Astercad",
-            "xp": 1,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "regnus_bighead",
-            "image": "regnus_bighead.png",
-            "name": "Regnus Bighead",
-            "xp": 2,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "starfish",
-            "image": "starfish.png",
-            "name": "Starfish",
-            "xp": 5,
-            "rarity": "RARE"
-        },
-        {
-            "id": "stellar_squirrelfish",
-            "image": "stellar_squirrelfish.png",
-            "name": "Stellar Squirrelfish",
-            "xp": 5,
-            "rarity": "RARE"
-        },
-        {
-            "id": "flaming_grouper",
-            "image": "flaming_grouper.png",
-            "name": "Flaming Grouper",
-            "xp": 1,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "snowy_bighead",
-            "image": "snowy_bighead.png",
-            "name": "Snowy Bighead",
-            "xp": 2,
-            "rarity": "RARE"
-        },
-        {
-            "id": "coral",
-            "image": "coral.png",
-            "name": "Coral",
-            "xp": 5,
-            "rarity": "RARE"
-        },
-        {
-            "id": "astermackere",
-            "image": "astermackere.png",
-            "name": "Astermackere",
-            "xp": 1,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "continental_puffer",
-            "image": "continental_puffer.png",
-            "name": "Continental Puffer",
-            "xp": 2,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "rockpea",
-            "image": "rockpea.png",
-            "name": "Rockpea",
-            "xp": 3,
-            "rarity": "COMMON"
-        },
-        {
-            "id": "jellyfish",
-            "image": "jellyfish.png",
-            "name": "Jellyfish",
-            "xp": 5,
-            "rarity": "RARE"
-        }
-    ]
+  "fishes": [
+    {
+      "id": "astercad",
+      "image": "astercad.png",
+      "name": "Astercad",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "regnus_bighead",
+      "image": "regnus_bighead.png",
+      "name": "Regnus Bighead",
+      "xp": 2,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "starfish",
+      "image": "starfish.png",
+      "name": "Starfish",
+      "xp": 5,
+      "rarity": "RARE",
+      "category": "SEA_CREATURE"
+    },
+    {
+      "id": "stellar_squirrelfish",
+      "image": "stellar_squirrelfish.png",
+      "name": "Stellar Squirrelfish",
+      "xp": 5,
+      "rarity": "RARE",
+      "category": "FISH"
+    },
+    {
+      "id": "lantern_puffer",
+      "image": "lantern_puffer.png",
+      "name": "Lantern Puffer",
+      "xp": 5,
+      "rarity": "MYTHICAL",
+      "category": "FISH"
+    },
+    {
+      "id": "flaming_grouper",
+      "image": "flaming_grouper.png",
+      "name": "Flaming Grouper",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "snowy_bighead",
+      "image": "snowy_bighead.png",
+      "name": "Snowy Bighead",
+      "xp": 2,
+      "rarity": "RARE",
+      "category": "FISH"
+    },
+    {
+      "id": "coral",
+      "image": "coral.png",
+      "name": "Coral",
+      "xp": 5,
+      "rarity": "RARE",
+      "category": "SEA_CREATURE"
+    },
+    {
+      "id": "hanikon_bighead",
+      "image": "hanikon_bighead.png",
+      "name": "Hanikon Bighead",
+      "xp": 5,
+      "rarity": "MYTHICAL",
+      "category": "FISH"
+    },
+    {
+      "id": "astermackere",
+      "image": "astermackere.png",
+      "name": "Astermackere",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "continental_puffer",
+      "image": "continental_puffer.png",
+      "name": "Continental Puffer",
+      "xp": 2,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "rockpea",
+      "image": "rockpea.png",
+      "name": "Rockpea",
+      "xp": 3,
+      "rarity": "COMMON",
+      "category": "FISH"
+    },
+    {
+      "id": "jellyfish",
+      "image": "jellyfish.png",
+      "name": "Jellyfish",
+      "xp": 5,
+      "rarity": "RARE",
+      "category": "SEA_CREATURE"
+    },
+    {
+      "id": "azure_damsel",
+      "image": "azure_damsel.png",
+      "name": "Azure Damsel",
+      "xp": 5,
+      "rarity": "MYTHICAL",
+      "category": "FISH"
+    },
+    {
+      "id": "glass_bottle",
+      "image": "glass_bottle.png",
+      "name": "Glass Bottle",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "glass_bottle",
+      "image": "glass_bottle.png",
+      "name": "Glass Bottle",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "glass_bottle",
+      "image": "glass_bottle.png",
+      "name": "Glass Bottle",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "glass_bottle",
+      "image": "glass_bottle.png",
+      "name": "Glass Bottle",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "jar",
+      "image": "jar.png",
+      "name": "Jar",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "floatie",
+      "image": "floatie.png",
+      "name": "Floatie",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "night_lamp",
+      "image": "night_lamp.png",
+      "name": "Night Lamp",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "legacy_part_1",
+      "image": "legacy_part_1.png",
+      "name": "Legacy Part #1",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "legacy_part_1",
+      "image": "legacy_part_1.png",
+      "name": "Legacy Part #1",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "legacy_part_2",
+      "image": "legacy_part_2.png",
+      "name": "Legacy Part #2",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "legacy_part_3",
+      "image": "legacy_part_3.png",
+      "name": "Legacy Part #3",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "legacy_part_4",
+      "image": "legacy_part_4.png",
+      "name": "Legacy Part #4",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "artisian_tools",
+      "image": "artisian_tools.png",
+      "name": "Artisian Tools",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "billboard_1",
+      "image": "billboard_1.png",
+      "name": "Billboard #1",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "aluminium_billboard",
+      "image": "aluminium_billboard.png",
+      "name": "Aluminium Billboard",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "abandoned_billboard",
+      "image": "abandoned_billboard.png",
+      "name": "Abandoned Billboard",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "abandoned_signboard",
+      "image": "abandoned_signboard.png",
+      "name": "Abandoned Signboard",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "wooden_billboard",
+      "image": "wooden_billboard.png",
+      "name": "Wooden Billboard",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "aluminium_signboard",
+      "image": "aluminium_signboard.png",
+      "name": "Aluminium Signboard",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    },
+    {
+      "id": "wooden_chest",
+      "image": "wooden_chest.png",
+      "name": "Wooden Chest",
+      "xp": 1,
+      "rarity": "COMMON",
+      "category": "TRASH"
+    }
+  ]
 }
