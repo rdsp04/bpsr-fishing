@@ -12,14 +12,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
 
-        @font-face {
-        font-family: 'Lexand';
-        src: url('./font/LexendDeca-VariableFont_wght.ttf') format('truetype');
+        html {
+        overflow: hidden;
         }
 
         body {
-            background-color: #111;
-            font-family: 'Viga', sans-serif !important;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow-y: scroll;
+        background-color: #111;
+        font-family: 'Viga', sans-serif !important;
+
+        }
+        #app {
+        height: auto;
+        overflow: visible;
+        }
+
+        body::-webkit-scrollbar {
+        width: 8px;
+        }
+
+        body::-webkit-scrollbar-thumb {
+        background: #0284C7;
+        border-radius: 4px;
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+        background: #0369A1;
         }
 
         table {
@@ -76,7 +97,12 @@
 
 <body class="text-white font-sans p-4">
 
-    <h1 class="text-2xl font-bold text-center mb-4">BPSR FISHING</h1>
+<div id="app">
+
+   <div class="px-4 flex items-center justify-center gap-2">
+    <h1 class="text-5xl font-bold text-center mb-4">BPSR FISHING</h1>
+    <img class="h-32 w-32" src="https://assets-ng.maxroll.gg/sr-tools/assets/db/icons/items/miscellaneous/item_icons_fishbait04.webp" alt="Icon">
+   </div>
 
     <!-- Tabs -->
     <div class="flex gap-2 mb-4 place-content-center font-bold text-xl">
@@ -142,6 +168,7 @@
             </select>
         </div>
     </div>
+</div>
 
     <script>
         const dailyTab = document.getElementById('tab-daily');

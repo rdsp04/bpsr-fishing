@@ -1,60 +1,65 @@
 import webview
-from pathlib import Path
-from src.utils.path import get_data_dir
-from src.ui.stats_api import StatsApi
-from src.ui.overview_api import OverviewApi
+from enum import Enum
 
-BASE = get_data_dir()
-HTML_PATH = BASE / "html"
-
-class Window:
-    STATS = "stats"
-    OVERLAY = "overlay"
 
 windows = {}
 
+class Window(Enum):
+    MAIN = "main"
+    OVERLAY = "overlay"
+
+
+def get_window(window_type: Window):
+ 
+    return windows.get(window_type.value)
+
+
 def start_ui():
+    from src.ui.stats_api import StatsApi
+    from src.ui.overview_api import OverviewApi
+    from src.utils.path import get_data_dir
+
+    BASE = get_data_dir()
+    HTML_PATH = BASE / "html"
+
     api = StatsApi()
     overview_api = OverviewApi()
 
+  
     with open(HTML_PATH / "overlay.html", "r", encoding="utf-8") as f:
         overlay_html = f.read()
     with open(HTML_PATH / "main.html", "r", encoding="utf-8") as f:
         main_html = f.read()
 
-    windows[Window.STATS] = webview.create_window(
+
+    main_window = webview.create_window(
         "bpsr-fishing Stats",
         html=main_html,
         js_api=api,
-        width=800,
-        height=600,
+        width=1200,
+        height=700,
         min_size=(400, 300),
         resizable=True,
         frameless=False,
-        transparent=True,
+        transparent=False,
         minimized=True,
     )
+    windows[Window.MAIN.value] = main_window
 
-    windows[Window.OVERLAY] = webview.create_window(
+
+    overlay_window = webview.create_window(
         "bpsr-fishing Overlay",
         html=overlay_html,
         js_api=overview_api,
-        width=300,
-        height=150,
-        resizable=True,
         frameless=True,
-        transparent=True,
-        on_top=True,
-        x=0,
-        y=0
+        transparent=False,  
+        easy_drag=True,
+        width=310,
+        height=170,
+        resizable=False,
+        on_top=True
     )
+    windows[Window.OVERLAY.value] = overlay_window
 
-    webview.start(debug=False, http_server=False)
-
-
-def get_window(window_enum: str):
-    return windows.get(window_enum)
-
-
-if __name__ == "__main__":
-    start_ui()
+    
+    webview.start()
