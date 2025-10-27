@@ -5,15 +5,18 @@ from tabulate import tabulate
 from pathlib import Path
 from src.fish.fish_service import FishService
 from src.utils.path import get_data_dir
+from src.utils.keybinds import resolve_key, key_to_str, set_key, get_key, DEFAULT_KEYS
 
 BASE = get_data_dir()
 FISH_FILE = BASE / "logs/fishing_log.json"
 BROKEN_FILE = BASE / "logs/broken_rods.json"
 CONFIG_PATH = BASE / "config/fish_config.json"
+
 DEFAULT_SETTINGS = {
     "resolution": "1920x1080",
     "auto_bait_purchase": "T1",
     "auto_rods_purchase": "T1",
+    **DEFAULT_KEYS
 }
 SETTINGS_FILE = BASE / "config/settings.json"
 
@@ -205,11 +208,21 @@ class FishStats:
 
         return f"<h3>Overall Stats</h3>{main_table}<h3>Fish Types</h3>{fish_type_table}"
 
+
 class StatsApi:
     def __init__(self):
         self.stats = FishStats()
         self._settings = self._load_settings()
 
+        # preload keys
+        self.start_key = get_key("start_key")
+        self.stop_key = get_key("stop_key")
+        self.fish_key = get_key("fish_key")
+        self.bait_key = get_key("bait_key")
+        self.rods_key = get_key("rods_key")
+        self.esc_key = get_key("esc_key")
+
+    # --- Settings file load/save ---
     def _load_settings(self):
         if SETTINGS_FILE.exists():
             try:
@@ -217,7 +230,6 @@ class StatsApi:
                     return json.load(f)
             except json.JSONDecodeError:
                 pass
-        # Return default if file missing or corrupted
         return DEFAULT_SETTINGS.copy()
 
     def _save_settings(self):
@@ -225,36 +237,86 @@ class StatsApi:
         with open(SETTINGS_FILE, "w") as f:
             json.dump(self._settings, f, indent=2)
 
+    # --- Resolution ---
     def set_resolution(self, res: str):
-        """Save new resolution"""
         self._settings["resolution"] = res
         self._save_settings()
 
     def get_resolution(self) -> str:
-        """Get current resolution"""
         return self._settings.get("resolution", DEFAULT_SETTINGS["resolution"])
 
+    # --- Auto bait / rod ---
     def set_auto_bait(self, bait: str):
-        """Save auto bait setting"""
         self._settings["auto_bait_purchase"] = bait
         self._save_settings()
 
     def get_auto_bait(self) -> str:
-        """Get current auto bait setting"""
-        return self._settings.get("auto_bait_purchase", DEFAULT_SETTINGS["auto_bait_purchase"])
+        return self._settings.get(
+            "auto_bait_purchase", DEFAULT_SETTINGS["auto_bait_purchase"]
+        )
 
     def set_auto_rod(self, rod: str):
-        """Save auto rod setting"""
         self._settings["auto_rods_purchase"] = rod
         self._save_settings()
 
     def get_auto_rod(self) -> str:
-        """Get current auto rod setting"""
-        return self._settings.get("auto_rods_purchase", DEFAULT_SETTINGS["auto_rods_purchase"])
+        return self._settings.get(
+            "auto_rods_purchase", DEFAULT_SETTINGS["auto_rods_purchase"]
+        )
 
+    # --- Keybinds ---
+    def _set_key(self, name: str, key_str: str):
+        resolved = resolve_key(key_str)
+        if not resolved:
+            raise ValueError(f"Invalid key: {key_str}")
+        setattr(self, name, resolved)
+        set_key(name, key_str)
+        self._settings[name] = key_str
+        self._save_settings()
+        return key_str
+
+    def _get_key(self, name: str):
+        return key_to_str(getattr(self, name))
+
+    def set_start_key(self, key_str):
+        return self._set_key("start_key", key_str)
+
+    def get_start_key(self):
+        return self._get_key("start_key")
+
+    def set_stop_key(self, key_str):
+        return self._set_key("stop_key", key_str)
+
+    def get_stop_key(self):
+        return self._get_key("stop_key")
+
+    def set_fish_key(self, key_str):
+        return self._set_key("fish_key", key_str)
+
+    def get_fish_key(self):
+        return self._get_key("fish_key")
+
+    def set_bait_key(self, key_str):
+        return self._set_key("bait_key", key_str)
+
+    def get_bait_key(self):
+        return self._get_key("bait_key")
+
+    def set_rods_key(self, key_str):
+        return self._set_key("rods_key", key_str)
+
+    def get_rods_key(self):
+        return self._get_key("rods_key")
+
+    def set_esc_key(self, key_str):
+        return self._set_key("esc_key", key_str)
+
+    def get_esc_key(self):
+        return self._get_key("esc_key")
+
+    # --- Stats functions ---
     def get_daily_table(self):
         self.stats.refresh()
-        print(self.stats.get_all_daily_tables())
         return self.stats.get_all_daily_tables()
 
     def get_overall_summary(self):
@@ -262,7 +324,5 @@ class StatsApi:
         return self.stats.get_overall_summary()
 
     def get_dates(self):
-        """Return list of all recorded dates"""
         self.stats.refresh()
-        print(sorted(self.stats.fish_summary.keys()))
         return sorted(self.stats.fish_summary.keys())

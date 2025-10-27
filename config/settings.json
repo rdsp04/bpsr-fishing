@@ -3,5 +3,9 @@
   "auto_bait_purchase": "T1",
   "auto_rods_purchase": "T1",
   "start_key": "F9",
-  "stop_key": "F10"
+  "stop_key": "F10",
+  "rods_key": "M",
+  "bait_key": "N",
+  "fish_key": "F",
+  "esc_key": "ESC"
 }
