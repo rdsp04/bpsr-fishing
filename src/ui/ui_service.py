@@ -1,4 +1,17 @@
 import webview
+from enum import Enum
+
+
+windows = {}
+
+class Window(Enum):
+    MAIN = "main"
+    OVERLAY = "overlay"
+
+
+def get_window(window_type: Window):
+ 
+    return windows.get(window_type.value)
 
 
 def start_ui():
@@ -12,10 +25,12 @@ def start_ui():
     api = StatsApi()
     overview_api = OverviewApi()
 
+  
     with open(HTML_PATH / "overlay.html", "r", encoding="utf-8") as f:
         overlay_html = f.read()
     with open(HTML_PATH / "main.html", "r", encoding="utf-8") as f:
         main_html = f.read()
+
 
     main_window = webview.create_window(
         "bpsr-fishing Stats",
@@ -29,19 +44,22 @@ def start_ui():
         transparent=False,
         minimized=True,
     )
+    windows[Window.MAIN.value] = main_window
+
 
     overlay_window = webview.create_window(
-    "bpsr-fishing Overlay",
-    html=overlay_html,
-    js_api=overview_api,
-    frameless=True,
-    transparent=False,
-    easy_drag=True,
-    width=310,
-    height=170,
-    resizable=False,
-    on_top=True
-)
+        "bpsr-fishing Overlay",
+        html=overlay_html,
+        js_api=overview_api,
+        frameless=True,
+        transparent=False,  
+        easy_drag=True,
+        width=310,
+        height=170,
+        resizable=False,
+        on_top=True
+    )
+    windows[Window.OVERLAY.value] = overlay_window
 
-
+    
     webview.start()
