@@ -97,7 +97,6 @@ def on_press(key):
     overlay = get_window(Window.OVERLAY)
     sessions = load_sessions()
 
-    print(key)
     if key == START_KEY:
         window_title = select_window()
         if not window_title:
