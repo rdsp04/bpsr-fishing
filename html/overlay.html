@@ -19,108 +19,110 @@
       color: #fff;
     }
 
-    .overlay {
-      backdrop-filter: blur(10px) saturate(180%);
-      -webkit-backdrop-filter: blur(10px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      width: 340px;
-      height: 150px;
-      position: relative;
-      background: #141517;
-      border-radius: 12px;
-    }
+        .overlay {
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            width: 340px;
+            height: 150px;
+            position: relative;
+            background: #141517;
+            border-radius: 12px;
+        }
 
-    .control-btn {
-      transition: all 0.25s ease;
-      font-weight: 600;
-      padding: 3px 8px;
-      font-size: 11px;
-    }
+        .control-btn {
+            transition: all 0.25s ease;
+            font-weight: 600;
+            padding: 3px 8px;
+            font-size: 11px;
+        }
 
-    .control-btn:hover {
-      transform: scale(1.05);
-    }
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
 
-    .divider {
-      width: 1px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.1);
-      margin: 0 10px;
-    }
+        .divider {
+            width: 1px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 10px;
+        }
 
-    .window-controls {
-      position: absolute;
-      top: 12px;
-      right: 10px;
-      display: flex;
-      gap: 6px;
-    }
+        .window-controls {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
 
-    .window-btn {
-      color: white;
-      transition: color 0.25s, transform 0.2s, filter 0.3s;
-    }
+        .window-btn {
+            color: white;
+            transition: color 0.25s, transform 0.2s, filter 0.3s;
+        }
 
-    .window-btn:hover {
-      color: #8b949e;
-      filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
-      transform: scale(1.15);
-    }
+        .window-btn:hover {
+            color: #8b949e;
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+            transform: scale(1.15);
+        }
 
-    .stat-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      line-height: 1.3;
-    }
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.3;
+        }
 
-    .stat-line i {
-      width: 14px;
-      text-align: center;
-      transition: 0.3s ease;
-    }
+        .stat-line i {
+            width: 14px;
+            text-align: center;
+            transition: 0.3s ease;
+        }
 
-    .stat-line span:last-child {
-      min-width: 24px;
-      text-align: right;
-    }
+        .stat-line span:last-child {
+            min-width: 24px;
+            text-align: right;
+        }
 
-    /* 🎨 Glow efekty (drop-shadow místo text-shadow) */
-    .fa-fish {
-      color: #22c55e;
-      filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.8));
-    }
+        /* 🎨 Glow efekty (drop-shadow místo text-shadow) */
+        .fa-fish {
+            color: #22c55e;
+            filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.8));
+        }
 
-    .fa-wind {
-      color: #ef4444;
-      filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.8));
-    }
+        .fa-wind {
+            color: #ef4444;
+            filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.8));
+        }
 
-    .fa-brain {
-      color: #3b82f6;
-      filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8));
-    }
+        .fa-brain {
+            color: #3b82f6;
+            filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.8));
+        }
 
-    .fa-percent {
-      color: #eab308;
-      filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.8));
-    }
+        .fa-percent {
+            color: #eab308;
+            filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.8));
+        }
 
-    .fa-power-off {
-      color: #d1d5db;
-      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
-    }
+        .fa-power-off {
+            color: #d1d5db;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
+        }
 
-    .fa-clock {
-      color: #facc15;
-      filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.8));
-    }
+        .fa-clock {
+            color: #facc15;
+            filter: drop-shadow(0 0 4px rgba(250, 204, 21, 0.8));
+        }
+    </style>
+</head>
 
   </style>
 </head>
@@ -183,52 +185,65 @@
     const closeBtn = document.getElementById('close-btn');
     const minimizeBtn = document.getElementById('minimize-btn');
 
-    let startTime = null;
-    let timerInterval = null;
+        let startTime = null;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let botRunning = false;
 
-    window.toggleBotStatus = function (state) {
-        setStatus(state);
-    };
+        window.toggleBotStatus = function (state) {
+            setStatus(state);
+        };
 
 
-    window.updateStats = function (data) {
-        if (data.catches !== undefined) document.getElementById('stat-catches').textContent = data.catches;
-        if (data.misses !== undefined) document.getElementById('stat-misses').textContent = data.misses;
-        if (data.xp !== undefined) document.getElementById('stat-xp').textContent = data.xp;
-        if (data.rate !== undefined) document.getElementById('stat-rate').textContent = data.rate + '%';
-    };
+        window.updateStats = function (data) {
+            if (data.catches !== undefined) document.getElementById('stat-catches').textContent = data.catches;
+            if (data.misses !== undefined) document.getElementById('stat-misses').textContent = data.misses;
+            if (data.xp !== undefined) document.getElementById('stat-xp').textContent = data.xp;
+            if (data.rate !== undefined) document.getElementById('stat-rate').textContent = data.rate + '%';
+        };
 
-    function setStatus(state) {
-      botRunning = state === 'running';
+        function setStatus(state) {
+            botRunning = state === 'running';
 
-      if (botRunning) {
-        indicator.className = 'status-dot w-4 h-4 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] mb-1';
-        statusText.textContent = 'Running';
-        statusText.className = 'text-green-300';
+            if (botRunning) {
+                indicator.className = 'status-dot w-4 h-4 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] mb-1';
+                statusText.textContent = 'Running';
+                statusText.className = 'text-green-300';
 
-        if (!startTime) startTime = new Date();
-        if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
-      } else {
-        indicator.className = 'status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1';
-        statusText.textContent = 'Stopped';
-        statusText.className = 'text-red-300';
-      }
-    }
+                startTime = new Date() - elapsedTime;
+                if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                indicator.className = 'status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1';
+                statusText.textContent = 'Stopped';
+                statusText.className = 'text-red-300';
 
-    function updateTimer() {
-      const diff = new Date() - startTime;
-      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      timer.textContent = `${h}:${m}:${s}`;
-    }
+                clearInterval(timerInterval);
+                timerInterval = null;
+                elapsedTime = new Date() - startTime;
+            }
+        }
 
-    document.getElementById('start-btn').addEventListener('click', () => setStatus('running'));
-    document.getElementById('stop-btn').addEventListener('click', () => setStatus('stopped'));
 
-    minimizeBtn.addEventListener('click', () => {
-      if (window.pywebview) window.pywebview.api.minimize_window();
-    });
+        function updateTimer() {
+            const diff = new Date() - startTime;
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            timer.textContent = `${h}:${m}:${s}`;
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () => setStatus('running'));
+        document.getElementById('stop-btn').addEventListener('click', () => setStatus('stopped'));
+
+        minimizeBtn.addEventListener('click', () => {
+            if (window.pywebview) window.pywebview.api.minimize_window();
+        });
+
+        closeBtn.addEventListener('click', () => {
+            if (window.pywebview) window.pywebview.api.close_window();
+        });
+    </script>
+</body>
 
     closeBtn.addEventListener('click', () => {
       if (window.pywebview) window.pywebview.api.close_window();
