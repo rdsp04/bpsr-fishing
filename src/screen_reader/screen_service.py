@@ -17,8 +17,9 @@ class ScreenService:
         for i in range(retries):
             try:
                 return pyautogui.screenshot(region=region)
-            except Exception:
-                print(f"Screenshot failed, retrying ({i+1}/{retries})...")
+            except Exception as e:
+                print(f"Screenshot failed: {e}")
+                print(f"Retrying ({i + 1}/{retries})...")
                 time.sleep(delay)
         return None
 
