@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Fishing Overlay</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="utf-8">
+    <title>Fishing Overlay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap"
+      rel="stylesheet">
 
-  <style>
+    <style>
     html, body {
       width: 100%;
       height: 100%;
@@ -123,16 +125,25 @@
     }
 
   </style>
-</head>
+  </head>
 
-<body class="flex items-center justify-center w-screen h-screen">
-  <div class="overlay">
-    <!-- Status -->
-    <div class="flex flex-col items-center text-xs">
-      <div id="status-indicator" class="status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1"></div>
-      <div class="flex items-center gap-2 text-gray-300">
-        <i class="fa-solid fa-power-off"></i>
-        <span id="status-text">Stopped</span>
+  <body class="flex items-center justify-center w-screen h-screen">
+    <div class="overlay">
+      <!-- Status -->
+      <div class="flex flex-col items-center text-xs">
+        <div id="status-indicator"
+          class="status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1"></div>
+        <div class="flex items-center gap-2 text-gray-300">
+          <i class="fa-solid fa-power-off"></i>
+          <span id="status-text">Stopped</span>
+        </div>
+
+        <!-- Timer -->
+        <div
+          class="flex items-center gap-1 mt-1 text-yellow-400 font-mono text-xs">
+          <i class="fa-solid fa-clock"></i>
+          <span id="timer">00:00:00</span>
+        </div>
       </div>
 
       <!-- Timer -->
@@ -186,18 +197,32 @@
     let startTime = null;
     let timerInterval = null;
 
+    window.toggleBotStatus = function (state) {
+        setStatus(state);
+    };
+
+
+    window.updateStats = function (data) {
+        if (data.catches !== undefined) document.getElementById('stat-catches').textContent = data.catches;
+        if (data.misses !== undefined) document.getElementById('stat-misses').textContent = data.misses;
+        if (data.xp !== undefined) document.getElementById('stat-xp').textContent = data.xp;
+        if (data.rate !== undefined) document.getElementById('stat-rate').textContent = data.rate + '%';
+    };
+
     function setStatus(state) {
-      if (state === 'running') {
+      botRunning = state === 'running';
+
+      if (botRunning) {
         indicator.className = 'status-dot w-4 h-4 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] mb-1';
         statusText.textContent = 'Running';
         statusText.className = 'text-green-300';
-        startTime = new Date();
-        timerInterval = setInterval(updateTimer, 1000);
+
+        if (!startTime) startTime = new Date();
+        if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
       } else {
         indicator.className = 'status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1';
         statusText.textContent = 'Stopped';
         statusText.className = 'text-red-300';
-        clearInterval(timerInterval);
       }
     }
 

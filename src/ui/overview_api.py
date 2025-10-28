@@ -1,6 +1,14 @@
 import webview
-from src.utils.keybinds import get_keys, set_keys, DEFAULT_START_KEY, DEFAULT_STOP_KEY, KEY_MAP
-
+from src.utils.keybinds import (
+    get_keys,
+    set_keys,
+    get_key,
+    set_key,
+    resolve_key,
+    key_to_str,
+    DEFAULT_START_KEY,
+    DEFAULT_STOP_KEY,
+)
 def get_window(title):
     for w in webview.windows:
         if w.title == title:
@@ -32,20 +40,29 @@ class OverviewApi:
             window.destroy()
         return "closed"
 
-    # Key methods
+   # --- Generic key conversion helpers ---
+    def _key_to_str(self, key_obj):
+        return key_to_str(key_obj)
+
+    def _str_to_key(self, key_str, fallback=None):
+        resolved = resolve_key(key_str)
+        return resolved or fallback
+
+    # --- Start/Stop keys ---
     def get_start_key(self):
-        var = self.start_key.name if hasattr(self.start_key, "name") else str(self.start_key)
-        return var
+        return self._key_to_str(self.start_key)
 
     def get_stop_key(self):
-        return self.stop_key.name if hasattr(self.stop_key, "name") else str(self.stop_key)
+        return self._key_to_str(self.stop_key)
 
     def set_start_key(self, key_str):
-        self.start_key = KEY_MAP.get(key_str, self.start_key)
+        new_key = self._str_to_key(key_str, self.start_key)
+        self.start_key = new_key
         set_keys(key_str, self.get_stop_key())
         return key_str
 
     def set_stop_key(self, key_str):
-        self.stop_key = KEY_MAP.get(key_str, self.stop_key)
+        new_key = self._str_to_key(key_str, self.stop_key)
+        self.stop_key = new_key
         set_keys(self.get_start_key(), key_str)
         return key_str
