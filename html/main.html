@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+  <head>
     <meta charset="utf-8">
-    <script src="https://kit.fontawesome.com/fc0cae2ea4.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://kit.fontawesome.com/fc0cae2ea4.js"
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap"
+      rel="stylesheet">
     <title>Fisher Stats</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -93,84 +96,127 @@
         }
 
     </style>
-</head>
+  </head>
 
-<body class="text-white font-sans p-4">
+  <body class="text-white font-sans p-4">
 
-<div id="app">
+    <div id="app">
 
-   <div class="px-4 flex items-center justify-center gap-2">
-    <h1 class="text-5xl font-bold text-center mb-4">BPSR FISHING</h1>
-    <img class="h-32 w-32" src="https://assets-ng.maxroll.gg/sr-tools/assets/db/icons/items/miscellaneous/item_icons_fishbait04.webp" alt="Icon">
-   </div>
+      <div class="px-4 flex items-center justify-center gap-2">
+        <h1 class="text-5xl font-bold text-center mb-4">BPSR FISHING</h1>
+        <img class="h-32 w-32"
+          src="https://assets-ng.maxroll.gg/sr-tools/assets/db/icons/items/miscellaneous/item_icons_fishbait04.webp"
+          alt="Icon">
+      </div>
 
-    <!-- Tabs -->
-    <div class="flex gap-2 mb-4 place-content-center font-bold text-xl">
-        <button id="tab-daily" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-scroll"></i> Daily Stats</button>
-        <button id="tab-summary" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-fish-fins"></i> Summary</button>
-        <button id="tab-settings" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-gears"></i> Settings</button>
-        <button id="btn-refresh" class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i class="fa-solid fa-bug"></i> Refresh</button>
-    </div>
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-4 place-content-center font-bold text-xl">
+        <button id="tab-daily"
+          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
+            class="fa-solid fa-scroll"></i> Daily Stats</button>
+        <button id="tab-summary"
+          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
+            class="fa-solid fa-fish-fins"></i> Summary</button>
+        <button id="tab-settings"
+          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
+            class="fa-solid fa-gears"></i> Settings</button>
+        <button id="btn-refresh"
+          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
+            class="fa-solid fa-bug"></i> Refresh</button>
+      </div>
 
-    <!-- Pages -->
-    <div id="page-daily" class="space-y-6 overflow-auto max-h-[80vh]">
+      <!-- Pages -->
+      <div id="page-daily" class="space-y-6 overflow-auto max-h-[80vh]">
         <div id="daily-tables"></div>
-    </div>
+      </div>
 
-    <div id="page-summary" class="space-y-6 overflow-auto max-h-[80vh] hidden">
+      <div id="page-summary"
+        class="space-y-6 overflow-auto max-h-[80vh] hidden">
         <div id="summary-tables"></div>
-    </div>
+      </div>
 
-    <div id="page-settings" class="space-y-6 overflow-auto max-h-[80vh] hidden">
+      <div id="page-settings"
+        class="space-y-6 overflow-auto max-h-[80vh] hidden">
 
         <h2 class="text-xl font-bold">Display</h2>
 
         <div>
-            <label for="resolution">Resolution</label>
-            <select id="resolution">
-                <option value="1920x1080">1920x1080</option>
-            </select>
+          <label for="resolution">Resolution</label>
+          <select id="resolution">
+            <option value="1920x1080">1920x1080</option>
+          </select>
         </div>
 
         <h2 class="text-xl font-bold">Preferences</h2>
         <br>
-        <span class="text-sm px-1.5 py-1 bg-red-600 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i> Coming Soon <i class="fa-solid fa-triangle-exclamation"></i></span>
+        <span class="text-sm px-1.5 py-1 bg-red-600 rounded-full"><i
+            class="fa-solid fa-triangle-exclamation"></i> Coming Soon <i
+            class="fa-solid fa-triangle-exclamation"></i></span>
 
         <div>
-            <label for="auto-bait">Auto Bait Purchase</label>
-            <select id="auto-bait" disabled>
-                <option value="T1" selected>T1</option>
-                <option value="T2">T2</option>
-                <option value="T3">T3</option>
-            </select>
+          <label for="auto-bait">Auto Bait Purchase</label>
+          <select id="auto-bait" disabled>
+            <option value="T1" selected>T1</option>
+            <option value="T2">T2</option>
+            <option value="T3">T3</option>
+          </select>
         </div>
 
         <div>
-            <label for="auto-rods">Auto Rods Purchase</label>
-            <select id="auto-rods" disabled>
-                <option value="T1" selected>T1</option>
-                <option value="T2">T2</option>
-                <option value="T3">T3</option>
-            </select>
+          <label for="auto-rods">Auto Rods Purchase</label>
+          <select id="auto-rods" disabled>
+            <option value="T1" selected>T1</option>
+            <option value="T2">T2</option>
+            <option value="T3">T3</option>
+          </select>
         </div>
 
         <div>
-            <label for="start-key">Start Keybind</label>
-            <select id="start-key" disabled>
-                <option value="T1" selected>F9</option>
-            </select>
+          <label for="start-key">Start Keybind</label>
+          <select id="start-key" disabled></select>
         </div>
 
         <div>
-            <label for="stop-key">Stop Keybind</label>
-            <select id="stop-key" disabled>
-                <option value="T1" selected>F10</option>
-            </select>
+          <label for="stop-key">Stop Keybind</label>
+          <select id="stop-key" disabled></select>
         </div>
+
+        <div>
+          <label for="fish-key">Fish Key</label>
+          <select id="fish-key" disabled></select>
+        </div>
+
+        <div>
+          <label for="bait-key">Bait Key</label>
+          <select id="bait-key" disabled></select>
+        </div>
+
+        <div>
+          <label for="rods-key">Rods Key</label>
+          <select id="rods-key" disabled></select>
+        </div>
+
+        <div>
+          <label for="esc-key">Escape Key</label>
+          <select id="esc-key" disabled></select>
+        </div>
+
+      </div>
     </div>
-</div>
 
     <script>
+        const allKeys = [
+          'A','B','C','D','E','F','G','H','I','J','K','L','M',
+          'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+          '0','1','2','3','4','5','6','7','8','9',
+          'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+          'ESC','TAB','CAPSLOCK','SHIFT','CTRL','ALT','SPACE','ENTER','BACKSPACE',
+          'INSERT','DELETE','HOME','END','PAGEUP','PAGEDOWN','LEFT','UP','RIGHT','DOWN',
+          '`','-','=','[',']','\\',';','\'',',','.','/','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}','|',':','"','<','>','?'
+        ];
+
+
+
         const dailyTab = document.getElementById('tab-daily');
         const summaryTab = document.getElementById('tab-summary');
         const settingsTab = document.getElementById('tab-settings');
@@ -225,13 +271,19 @@
             await loadDaily();
             await loadSummary();
         };
+        const keybinds = [
+            'start-key',
+            'stop-key',
+            'fish-key',
+            'bait-key',
+            'rods-key',
+            'esc-key'
+        ];
 
-        // Initial load
         window.addEventListener('pywebviewready', async () => {
             await loadDaily();
             await loadSummary();
 
-            // Load current settings values
             const res = await window.pywebview.api.get_resolution();
             document.getElementById('resolution').value = res;
 
@@ -240,9 +292,38 @@
 
             const rod = await window.pywebview.api.get_auto_rod();
             document.getElementById('auto-rods').value = rod;
+
+            for (let k of keybinds) {
+                const select = document.getElementById(k);
+                if (!select) continue;
+
+                select.innerHTML = '';
+                allKeys.forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.text = key;
+                    select.appendChild(opt);
+                });
+
+                try {
+                    const val = await window.pywebview.api[`get_${k.replace('-', '_')}`]();
+                    if (val) select.value = val.toUpperCase();
+                } catch(err) {
+                    console.error('Failed to get key', k, err);
+                }
+
+                select.onchange = async (e) => {
+                    try {
+                        await window.pywebview.api[`set_${k.replace('-', '_')}`](e.target.value);
+                    } catch(err) {
+                        console.error('Failed to set key', k, err);
+                    }
+                };
+            }
         });
+
     </script>
 
-</body>
+  </body>
 
 </html>
