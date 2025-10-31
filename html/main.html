@@ -170,35 +170,40 @@
             <option value="T3">T3</option>
           </select>
         </div>
-
         <div>
-          <label for="start-key">Start Keybind</label>
-          <select id="start-key" disabled></select>
+          <label>Start Keybind</label>
+          <button id="start_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">/</button>
         </div>
 
         <div>
-          <label for="stop-key">Stop Keybind</label>
-          <select id="stop-key" disabled></select>
+          <label>Stop Keybind</label>
+          <button id="stop_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">.</button>
         </div>
 
         <div>
-          <label for="fish-key">Fish Key</label>
-          <select id="fish-key" disabled></select>
+          <label>Fish Key</label>
+          <button id="fish_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">F</button>
         </div>
 
         <div>
-          <label for="bait-key">Bait Key</label>
-          <select id="bait-key" disabled></select>
+          <label>Bait Key</label>
+          <button id="bait_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">N</button>
         </div>
 
         <div>
-          <label for="rods-key">Rods Key</label>
-          <select id="rods-key" disabled></select>
+          <label>Rods Key</label>
+          <button id="rods_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">M</button>
         </div>
 
         <div>
-          <label for="esc-key">Escape Key</label>
-          <select id="esc-key" disabled></select>
+          <label>Escape Key</label>
+          <button id="esc_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">ESC</button>
         </div>
 
       </div>
@@ -265,24 +270,55 @@
         document.getElementById('auto-rods').onchange = async (e) => {
             await window.pywebview.api.set_auto_rod(e.target.value);
         };
+        const keyButtons = [
+            "start_key",
+            "stop_key",
+            "fish_key",
+            "bait_key",
+            "rods_key",
+            "esc_key"
+        ];
+
+        async function initKeyButtons() {
+            for (let keyName of keyButtons) {
+                const btn = document.getElementById(`${keyName}-btn`);
+                if (!btn) continue;
+
+                // Load initial key from Python
+                try {
+                    const val = await window.pywebview.api.get_key(keyName);
+                    btn.textContent = val || "Unset";
+                } catch(err) {
+                    console.error(`Failed to get key: ${keyName}`, err);
+                    btn.textContent = "Unset"; // fallback
+                }
+
+                btn.onclick = async () => {
+                    btn.classList.add("border-green-500"); // listening indicator
+
+                    try {
+                        const key = await window.pywebview.api.capture_key_for(keyName);
+                        btn.textContent = key; // update to new key
+                    } catch(err) {
+                        console.error(`Failed to capture key: ${keyName}`, err);
+                    } finally {
+                        btn.classList.remove("border-green-500");
+                    }
+                };
+            }
+        }
 
         // Refresh button
         refreshBtn.onclick = async () => {
             await loadDaily();
             await loadSummary();
         };
-        const keybinds = [
-            'start-key',
-            'stop-key',
-            'fish-key',
-            'bait-key',
-            'rods-key',
-            'esc-key'
-        ];
 
         window.addEventListener('pywebviewready', async () => {
             await loadDaily();
             await loadSummary();
+            await initKeyButtons();
+
 
             const res = await window.pywebview.api.get_resolution();
             document.getElementById('resolution').value = res;
