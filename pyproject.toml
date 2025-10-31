@@ -5,12 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "easyocr>=1.7.2",
     "numpy>=2.3.4",
     "opencv-python>=4.11.0.86",
     "pyautogui>=0.9.54",
     "pygetwindow>=0.0.9",
     "pyinstaller>=6.16.0",
     "pynput>=1.8.1",
+    "pytesseract>=0.3.13",
     "pywebview>=6.1",
     "pywin32>=311",
     "requests>=2.32.5",
