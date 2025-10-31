@@ -17,9 +17,12 @@ from src.screen_reader.image_service import ImageService
 from src.screen_reader.base import get_resolution_folder
 from src.ui.ui_service import start_ui
 import threading
+from threading import Event
+
 from log_main import load_sessions, save_sessions
 from src.fish.fish_service import FishService
 
+macro_start_event = Event()
 
 # Services
 screen_service = ScreenService()
@@ -92,36 +95,54 @@ def update_ui_stats():
 from src.ui.ui_service import get_window, Window
 
 
-def on_press(key):
-    global macro_running, saved_continue_pos, window_title
+def handle_start_key():
+    global macro_start_event, window_title
+
     overlay = get_window(Window.OVERLAY)
     sessions = load_sessions()
 
+    window_title = select_window()
+    if not window_title:
+        print("No window found. Cannot start macro.")
+        macro_start_event.clear()
+        return
+
+    if not sessions or sessions[-1].get("stop") is not None:
+        sessions.append({"start": datetime.now().isoformat(), "stop": None})
+        save_sessions(sessions)
+        overlay.evaluate_js("window.toggleBotStatus('running');")
+        macro_start_event.set()
+        print(f"Macro started on window: {window_title}")
+    else:
+        print("Session already started. Press stop first.")
+
+
+def handle_stop_key():
+    global macro_start_event, saved_continue_pos, window_title
+
+    overlay = get_window(Window.OVERLAY)
+    sessions = load_sessions()
+
+    if sessions and sessions[-1].get("stop") is None:
+        sessions[-1]["stop"] = datetime.now().isoformat()
+        save_sessions(sessions)
+        macro_start_event.clear()
+        saved_continue_pos = None
+        window_title = None
+        print("Macro stopped")
+        overlay.evaluate_js("window.toggleBotStatus('stopped');")
+    else:
+        print("No active session to stop.")
+
+
+def on_press(key):
+    print(f"Key pressed: {key}")
+
     if key == START_KEY:
-        window_title = select_window()
-        if not window_title:
-            print("No window found. Cannot start macro.")
-            macro_running = False
-            return
-
-        if not sessions or sessions[-1].get("stop") is not None:
-            sessions.append({"start": datetime.now().isoformat(), "stop": None})
-            save_sessions(sessions)
-            overlay.evaluate_js("window.toggleBotStatus('running');")
-            macro_running = True
-            print(f"Macro started on window: {window_title}")
-        else:
-            print("Session already started. Press stop first.")
-
+        handle_start_key()
     elif key == STOP_KEY:
-        if sessions and sessions[-1].get("stop") is None:
-            sessions[-1]["stop"] = datetime.now().isoformat()
-            save_sessions(sessions)
-            macro_running = False
-            saved_continue_pos = None
-            window_title = None
-            print("Macro stopped")
-            overlay.evaluate_js("window.toggleBotStatus('stopped');")
+        handle_stop_key()
+
 
 
 # ---------------- Window Handling ----------------
@@ -179,16 +200,24 @@ def release_key(key):
 
 
 # ---------------- Fishing Logic ----------------
+last_progress_time = time.time()
+
+
 def post_catch_loop(window_title):
-    global macro_running, saved_continue_pos
+    global macro_start_event, saved_continue_pos, last_progress_time
     print("Fish took the bait")
+    last_progress_time = time.time()
+
     counter = 0
     last_print_time = time.time()
     last_check_time = time.time()
     mouse.press(Button.left)
 
     lane = 0
-    while macro_running:
+    while macro_start_event.is_set():
+        if time.time() - last_progress_time > NO_PROGRESS_LIMIT:
+            handle_no_progress_loop(window_title)
+
         counter += 1
         time.sleep(1 / SPAM_CPS)
 
@@ -216,12 +245,16 @@ def post_catch_loop(window_title):
         )
 
         if right_found:
+            last_progress_time = time.time()
+
             lane += 1
             if lane > 1:
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
             time.sleep(0.2)
         elif left_found:
+            last_progress_time = time.time()
+
             lane -= 1
             if lane < -1:
                 lane = -1
@@ -277,6 +310,8 @@ def post_catch_loop(window_title):
             last_check_time = time.time()
 
             if continue_found:
+                last_progress_time = time.time()
+
                 if saved_continue_pos is None:
                     saved_continue_pos = continue_found
                 print("Continue button found, releasing click")
@@ -304,10 +339,10 @@ def post_catch_loop(window_title):
                             print(
                                 f"Detected fish type: {fish_type} (score: {score:.3f})."
                             )
-                            #screenshot_path = (
+                            # screenshot_path = (
                             #    screenshot_folder / f"screenshot_{timestamp}_{fish_type}_({score:.3f}).png"
-                            #)
-                            #pyautogui.screenshot(screenshot_path)
+                            # )
+                            # pyautogui.screenshot(screenshot_path)
                             found = True
                             break
                         else:
@@ -398,20 +433,30 @@ def post_catch_loop(window_title):
 
 
 # ---------------- Main Loop ----------------
+restart_flag = False
+
+
 def main():
-    global macro_running
+    global macro_start_event, last_progress_time, restart_flag
     window_title = select_window()
     print(f"Macro waiting for START key ({START_KEY})")
+    last_progress_time = time.time()
 
     listener = Listener(on_press=on_press)
     listener.start()
 
     while True:
-        if not macro_running:
+
+        if not macro_start_event.is_set():
             time.sleep(0.1)
             continue
 
+        print(time.time() - last_progress_time)
+        if time.time() - last_progress_time > NO_PROGRESS_LIMIT:
+            handle_no_progress_loop(window_title)
+
         rect = get_window_rect(window_title)
+        print(time.time() - last_progress_time > NO_PROGRESS_LIMIT)
 
         default_found = image_service.find_image_in_window(
             rect,
@@ -424,6 +469,9 @@ def main():
             THRESHOLD,
         )
         if default_found:
+            last_progress_time = time.time()
+
+            print(time.time() - last_progress_time)
             print("Default screen detected")
             time.sleep(0.2)
 
@@ -440,6 +488,8 @@ def main():
             )
             if broken_pole:
                 print("Broken pole detected -> pressing M")
+                last_progress_time = time.time()
+
                 log_broken_rod()
                 press_key("m")
                 time.sleep(0.2)
@@ -454,6 +504,8 @@ def main():
                     0.9,
                 )
                 if use_rod:
+                    last_progress_time = time.time()
+
                     click(*use_rod)
                     time.sleep(1)
                 continue
@@ -461,9 +513,14 @@ def main():
             # Start fishing
             mouse.click(Button.left, 1)
             print("Started fishing -> waiting for catch_fish.png")
+            last_progress_time = time.time()
+
             time.sleep(1)
 
-            while macro_running:
+            while macro_start_event.is_set():
+                if time.time() - last_progress_time > NO_PROGRESS_LIMIT:
+                    handle_no_progress_loop(window_title)
+
                 catch_coords = image_service.find_image_in_window(
                     rect,
                     (
@@ -475,6 +532,8 @@ def main():
                     0.9,
                 )
                 if catch_coords:
+                    last_progress_time = time.time()
+
                     mouse.position = catch_coords
                     time.sleep(0.05)
                     post_catch_loop(window_title)
@@ -483,6 +542,64 @@ def main():
                 time.sleep(CHECK_INTERVAL)
 
         time.sleep(CHECK_INTERVAL)
+
+
+NO_PROGRESS_LIMIT = 45
+
+from src.utils.keybinds import get_key
+
+
+def restart_macro():
+    global restart_flag
+    print("Triggering macro restart...")
+
+    def _restart():
+        handle_stop_key()
+        time.sleep(0.5)  # let loops exit
+        handle_start_key()
+
+    threading.Thread(target=_restart, daemon=True).start()
+
+
+def handle_no_progress_loop(window_title):
+    global last_progress_time, macro_start_event
+    print("restart")
+
+    esc_key = get_key("esc_key")
+    fish_key = get_key("fish_key")
+
+    while macro_start_event.is_set():
+        rect = get_window_rect(window_title)
+        if not rect:
+            time.sleep(1)
+            continue
+
+        # Check if default screen is detected
+        default_found = image_service.find_image_in_window(
+            rect,
+            get_data_dir()
+            / TARGET_IMAGES_FOLDER
+            / get_resolution_folder()
+            / "default_screen.png",
+            0.9,
+        )
+        if default_found:
+            print("Default screen detected, stopping recovery loop.")
+            last_progress_time = time.time()
+            restart_macro()
+            break
+
+        # Perform recovery actions
+        print("No progress detected, performing recovery actions...")
+        if esc_key:
+            press_key(esc_key)
+            time.sleep(1)
+        if fish_key:
+            press_key(fish_key)
+            time.sleep(1)
+
+        last_progress_time = time.time()
+        time.sleep(1)
 
 
 def start_macro():
@@ -500,6 +617,8 @@ if __name__ == "__main__":
 
         macro_thread = threading.Thread(target=start_macro, daemon=True)
         macro_thread.start()
+
+        time.sleep(0.5)
 
         start_ui()
     finally:
