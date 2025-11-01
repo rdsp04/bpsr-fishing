@@ -21,7 +21,7 @@
           --input-bg: rgba(0,0,0,0.35);
           --border: rgba(255,255,255,0.03);
         }
-        
+
         html, body {
           height: 100%;
           margin: 0;
@@ -31,7 +31,7 @@
           overflow-x: hidden;
           position: relative;
         }
-        
+
         body::before {
           content: "";
           position: fixed;
@@ -46,28 +46,28 @@
           z-index: 0;
           pointer-events: none;
         }
-        
+
         @keyframes waterFlow {
           0% { transform: translate(-25%, -25%) scale(1.2) rotate(0deg); }
           50% { transform: translate(-30%, -20%) scale(1.25) rotate(180deg); }
           100% { transform: translate(-25%, -25%) scale(1.2) rotate(360deg); }
         }
-        
+
         @keyframes floaty {
           0%, 100% { text-shadow: 0 0 8px rgba(56,198,255,0.5), 0 0 20px rgba(56,198,255,0.25); }
           50% { text-shadow: 0 0 14px rgba(56,198,255,0.7), 0 0 32px rgba(56,198,255,0.4); }
         }
-        
+
         @keyframes glowPulse {
           0%, 100% { text-shadow: 0 0 10px #5de3ff, 0 0 20px #5de3ff; }
           50% { text-shadow: 0 0 20px #3db8e8, 0 0 30px #3db8e8; }
         }
-        
+
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .brand {
           position: fixed;
           top: 18px;
@@ -78,7 +78,7 @@
           z-index: 140;
           pointer-events: none;
         }
-        
+
         .brand .logo-text {
           font-size: 30px;
           font-weight: 700;
@@ -87,7 +87,7 @@
                        0 6px 22px rgba(2,10,20,0.6);
           animation: floaty 6s ease-in-out infinite;
         }
-        
+
         .brand .glow {
           position: absolute;
           top: 50%;
@@ -101,7 +101,7 @@
           opacity: 0.9;
           animation: glowPulse 3.6s ease-in-out infinite;
         }
-        
+
         .navbar {
           position: fixed;
           top: 20px;
@@ -110,7 +110,7 @@
           gap:10px;
           z-index:120;
         }
-        
+
         .nav-btn {
           background: rgba(0,0,0,0.25);
           border:1px solid rgba(255,255,255,0.03);
@@ -124,24 +124,24 @@
           align-items:center;
           transition:all 0.18s ease;
         }
-        
+
         .nav-btn.active {
           background: linear-gradient(90deg, rgba(56,198,255,0.12), rgba(2,90,180,0.06));
           border-color: rgba(56,198,255,0.45);
         }
-        
+
         #reset-btn {
           padding: 8px 10px;
           width: 42px;
           display: flex;
           justify-content: center;
         }
-        
+
         #reset-btn:hover i {
           transform: rotate(-90deg);
           transition: transform 0.3s ease;
         }
-        
+
         .wrap {
           max-width:1150px;
           margin:110px auto 60px;
@@ -149,7 +149,7 @@
           position:relative;
           z-index:10;
         }
-        
+
         .settings-panel {
           background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
           border-radius:14px;
@@ -158,7 +158,7 @@
           box-shadow: 0 10px 30px rgba(0,20,40,0.45);
           backdrop-filter: blur(6px);
         }
-        
+
         .settings-title {
           margin-top: 8px;
           font-size: 1.25rem;
@@ -168,7 +168,7 @@
                        0 6px 22px rgba(2,10,20,0.6);
           animation: floaty 6s ease-in-out infinite;
         }
-        
+
         .summary-panel {
           background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
           border-radius: 14px;
@@ -179,7 +179,7 @@
           color: var(--text);
           animation: fadeIn 1s ease-in-out;
         }
-        
+
         .summary-panel h3 {
           font-size: 1.4rem;
           font-weight: 700;
@@ -190,7 +190,7 @@
           margin-bottom: 10px;
           letter-spacing: 0.5px;
         }
-        
+
         .summary-panel table {
           width: 100%;
           border-collapse: collapse;
@@ -199,7 +199,7 @@
           border-radius: 12px;
           overflow: hidden;
         }
-        
+
         .summary-panel th {
           text-align: center;
           font-weight: bold;
@@ -208,83 +208,83 @@
           letter-spacing: 0.5px;
           padding: 10px 15px;
         }
-        
+
         .summary-panel td {
           padding: 8px 15px;
           color: #e6f7ff;
           text-align: right;
           transition: background 0.3s, color 0.3s;
         }
-        
+
         /* první sloupec vlevo */
         .summary-panel td:first-child,
         .summary-panel th:first-child {
           text-align: left !important;
         }
-        
+
         .summary-panel tr:hover td {
           background: linear-gradient(90deg, rgba(93,227,255,0.15), rgba(20,80,120,0.15));
           color: #c2faff;
           box-shadow: 0 0 10px rgba(93,227,255,0.15);
         }
-        
+
         .fish-row, .fish-entry {
           display: flex;
           justify-content: space-between;
           color: #3b82f6;
           padding: 4px 12px;
         }
-        
+
         .fish-name {
           font-weight: 500;
         }
-        
+
         .fish-count {
           font-weight: bold;
         }
-        
+
         .summary-panel table th {
           color: #aeeaff !important;
           text-align: center !important;
         }
-        
+
         .summary-panel table td {
           text-align: center !important;
         }
-        
+
         /* první sloupec vlevo */
         .summary-panel table td:first-child,
         .summary-panel table th:first-child {
           text-align: center !important;
         }
-        
+
         .settings-panel table,
         .settings-panel th,
         .settings-panel td {
           text-align: left !important;
           color: var(--text) !important;
         }
-        
+
         .settings-panel td:last-child {
           text-align: right !important;
         }
-        
+
         .settings-panel td {
           padding: 6px 12px;
         }
-        
+
         .settings-panel label,
         .settings-panel select {
           text-align: left !important;
           color: #e6f7ff;
         }
-        
+
         .settings-panel .field {
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
-        
+
         .settings-panel select {
           background: rgba(0, 20, 40, 0.35);
           border: 1px solid rgba(56,198,255,0.25);
@@ -293,7 +293,7 @@
           color: #bde8ff;
           width: 120px;
         }
-        
+
         .settings-panel {
           background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
           border-radius: 14px;
@@ -303,14 +303,14 @@
           backdrop-filter: blur(6px);
           color: var(--text);
         }
-        
+
         .settings-head {
           display: flex;
           align-items: center;
           justify-content: space-between;
           margin-bottom: 10px;
         }
-        
+
         .settings-title {
           margin-top: 8px;
           font-size: 1.25rem;
@@ -320,13 +320,13 @@
                        0 6px 22px rgba(2,10,20,0.6);
           animation: floaty 6s ease-in-out infinite;
         }
-        
+
         .resolution-wrapper {
           display: flex;
           align-items: center;
           gap: 10px;
         }
-        
+
         #resolution {
           background: rgba(15, 25, 35, 0.8);
           color: #b4e3ff;
@@ -339,7 +339,7 @@
           transition: all 0.4s ease;
           backdrop-filter: blur(4px);
         }
-        
+
         #resolution:hover {
           background: rgba(25, 45, 65, 0.9);
           box-shadow: 0 0 8px rgba(130, 200, 255, 0.4);
@@ -359,33 +359,33 @@
           transition: all 0.4s ease;
           opacity: 1;
         }
-        
+
         .res-pill.fade {
           opacity: 0;
           transform: scale(0.9);
         }
-        
+
         .settings-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr); 
+          grid-template-columns: repeat(4, 1fr);
           gap: 16px 22px;
           margin-top: 16px;
           align-items: center;
         }
-        
+
         .settings-grid .field {
           display: flex;
           flex-direction: column;
           gap: 4px;
         }
-        
+
         .settings-grid label {
           font-weight: 600;
           color: #aeeaff;
           font-size: 14px;
           letter-spacing: 0.3px;
         }
-        
+
         .settings-grid select {
           width: 100%;
           background: rgba(0, 30, 60, 0.25);
@@ -396,22 +396,22 @@
           font-size: 14px;
           transition: all 0.25s ease;
         }
-        
+
         .settings-grid select:hover {
           background: rgba(20, 60, 90, 0.35);
           box-shadow: 0 0 8px rgba(56,198,255,0.2);
         }
-        
+
         /* === RESPONSIVITA === */
         @media (max-width: 1100px) {
           .settings-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        
+
         @media (max-width: 700px) {
           .settings-grid { grid-template-columns: repeat(1, 1fr); }
         }
-        
-        
+
+
         /* === RESPONSIVITA === */
         @media (max-width:1100px) {
           .settings-grid { grid-template-columns: repeat(2,1fr); }
@@ -419,7 +419,7 @@
         @media (max-width:700px) {
           .settings-grid { grid-template-columns: repeat(1,1fr); }
         }
-        
+
         .key-btn {
           width: 80px;
           height: 40px;
@@ -432,7 +432,7 @@
           cursor: pointer;
           transition: all 0.15s ease;
         }
-        
+
         .key-btn:hover {
           background: rgba(0,180,255,0.15);
           border-color: rgba(0,180,255,0.3);
@@ -442,15 +442,15 @@
           border-color: #00b4ff;
           background: rgba(0,255,200,0.2);
         }
-        
+
         .key-btn.locked {
           opacity: 0.6;
           cursor: not-allowed;
-          background: #1f2937; 
+          background: #1f2937;
           color: #bbb;
           border: 1px solid #333;
         }
-        
+
         .key-btn.locked:hover {
           background: #1f2937;
         }
@@ -458,205 +458,108 @@
 
 </head>
 
-        <div>
-          <label for="auto-rods">Auto Rods Purchase</label>
-          <select id="auto-rods" disabled>
-            <option value="T1" selected>T1</option>
-            <option value="T2">T2</option>
-            <option value="T3">T3</option>
-          </select>
-        </div>
-        <div>
-          <label>Start Keybind</label>
-          <button id="start_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">/</button>
+<body>
+    <div class="brand">
+        <div class="glow"></div>
+        <div class="logo-text" id="logo-text">🐟 BPSR FISHING</div>
+    </div>
+
+    <div class="navbar">
+        <button id="tab-daily" class="nav-btn active"><i class="fa-solid fa-scroll"></i> Daily</button>
+        <button id="tab-summary" class="nav-btn"><i class="fa-solid fa-fish-fins"></i> Summary</button>
+        <button id="tab-settings" class="nav-btn"><i class="fa-solid fa-gear"></i> Settings</button>
+        <button id="reset-btn" class="nav-btn" title="Reset Interface"><i class="fa-solid fa-rotate-right"></i></button>
+    </div>
+
+    <div class="wrap">
+        <div id="page-settings" class="settings-panel" style="display:none;">
+            <div class="settings-head">
+                <div class="settings-title">Settings</div>
+                <div class="resolution-wrapper">
+                    <label for="resolution">Resolution</label>
+                    <select id="resolution">
+                        <option value="1920x1080">1920×1080</option>
+                        <option value="1600x900">1600×900</option>
+                    </select>
+                    <div id="res-pill" class="res-pill">1920×1080</div>
+                </div>
+            </div>
+
+            <div class="settings-grid">
+
+                <div class="field">
+                    <label>Auto Bait</label>
+                    <button id="auto-bait-btn" class="key-btn locked" disabled>T1</button>
+                </div>
+
+                <div class="field">
+                    <label>Auto Rods</label>
+                    <button id="auto-rods-btn" class="key-btn locked" disabled>T1</button>
+                </div>
+
+
+                <div class="field">
+                    <label>Start Key</label>
+                    <button id="start-key-btn" class="key-btn">F9</button>
+                </div>
+
+                <div class="field">
+                    <label>Stop Key</label>
+                    <button id="stop-key-btn" class="key-btn">F10</button>
+                </div>
+
+                <div class="field">
+                    <label>Fish Key</label>
+                    <button id="fish-key-btn" class="key-btn">F</button>
+                </div>
+
+                <div class="field">
+                    <label>Bait Key</label>
+                    <button id="bait-key-btn" class="key-btn">N</button>
+                </div>
+
+                <div class="field">
+                    <label>Rods Key</label>
+                    <button id="rods-key-btn" class="key-btn">M</button>
+                </div>
+
+                <div class="field">
+                    <label>Escape Key</label>
+                    <button id="esc-key-btn" class="key-btn">ESC</button>
+                </div>
+
+            </div>
+
+
+            <div style="margin-top:28px;padding:20px;border-radius:14px;background:linear-gradient(180deg,rgba(10,40,60,0.35),rgba(0,20,40,0.35));border:1px solid rgba(56,198,255,0.1);text-align:center;color:#8fcfff;font-size:15px;font-weight:600;letter-spacing:1px;">
+                💧 More features coming soon...
+            </div>
         </div>
 
-        <div>
-          <label>Stop Keybind</label>
-          <button id="stop_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">.</button>
+        <div id="page-daily">
+            <div id="daily-tables"></div>
         </div>
 
-        <div>
-          <label>Fish Key</label>
-          <button id="fish_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">F</button>
+        <div id="page-summary" style="display:none;">
+            <div id="summary-tables" class="summary-panel">
+                <div class="overall-stats-section">
+                    <h3 class="section-title">Overall Stats</h3>
+                    <div id="overall-stats" class="overall-stats"></div>
+                </div>
+                <div class="section-gap"></div>
+                <div class="fish-types-section">
+                    <h3 class="section-title">Fish Types</h3>
+                    <div id="fish-list" class="fish-list"></div>
+                </div>
+            </div>
         </div>
 
-        <div>
-          <label>Bait Key</label>
-          <button id="bait_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">N</button>
-        </div>
 
-        <div>
-          <label>Rods Key</label>
-          <button id="rods_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">M</button>
-        </div>
-
-        <div>
-          <label>Escape Key</label>
-          <button id="esc_key-btn"
-            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">ESC</button>
-        </div>
 
     </div>
     </div>
 
-    <script>
-        const allKeys = [
-          'A','B','C','D','E','F','G','H','I','J','K','L','M',
-          'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
-          '0','1','2','3','4','5','6','7','8','9',
-          'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
-          'ESC','TAB','CAPSLOCK','SHIFT','CTRL','ALT','SPACE','ENTER','BACKSPACE',
-          'INSERT','DELETE','HOME','END','PAGEUP','PAGEDOWN','LEFT','UP','RIGHT','DOWN',
-          '`','-','=','[',']','\\',';','\'',',','.','/','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}','|',':','"','<','>','?'
-        ];
-
-
-
-        const dailyTab = document.getElementById('tab-daily');
-        const summaryTab = document.getElementById('tab-summary');
-        const settingsTab = document.getElementById('tab-settings');
-        const refreshBtn = document.getElementById('btn-refresh');
-        const dailyPage = document.getElementById('page-daily');
-        const summaryPage = document.getElementById('page-summary');
-        const settingsPage = document.getElementById('page-settings');
-
-        async function loadDaily() {
-            const dailyHtml = await window.pywebview.api.get_daily_table();
-            document.getElementById('daily-tables').innerHTML = dailyHtml;
-        }
-
-        async function loadSummary() {
-            const summaryHtml = await window.pywebview.api.get_overall_summary();
-            document.getElementById('summary-tables').innerHTML = summaryHtml;
-        }
-
-        dailyTab.onclick = async () => {
-            await loadDaily();
-            dailyPage.classList.remove('hidden');
-            summaryPage.classList.add('hidden');
-            settingsPage.classList.add('hidden');
-        };
-
-        summaryTab.onclick = async () => {
-            await loadSummary();
-            dailyPage.classList.add('hidden');
-            summaryPage.classList.remove('hidden');
-            settingsPage.classList.add('hidden');
-        };
-
-        settingsTab.onclick = () => {
-            dailyPage.classList.add('hidden');
-            summaryPage.classList.add('hidden');
-            settingsPage.classList.remove('hidden');
-        };
-
-        // Save settings when changed
-        document.getElementById('resolution').onchange = async (e) => {
-            await window.pywebview.api.set_resolution(e.target.value);
-        };
-        document.getElementById('auto-bait').onchange = async (e) => {
-            await window.pywebview.api.set_auto_bait(e.target.value);
-        };
-        document.getElementById('auto-rods').onchange = async (e) => {
-            await window.pywebview.api.set_auto_rod(e.target.value);
-        };
-        const keyButtons = [
-            "start_key",
-            "stop_key",
-            "fish_key",
-            "bait_key",
-            "rods_key",
-            "esc_key"
-        ];
-
-        async function initKeyButtons() {
-            for (let keyName of keyButtons) {
-                const btn = document.getElementById(`${keyName}-btn`);
-                if (!btn) continue;
-
-                // Load initial key from Python
-                try {
-                    const val = await window.pywebview.api.get_key(keyName);
-                    btn.textContent = val || "Unset";
-                } catch(err) {
-                    console.error(`Failed to get key: ${keyName}`, err);
-                    btn.textContent = "Unset"; // fallback
-                }
-
-                btn.onclick = async () => {
-                    btn.classList.add("border-green-500"); // listening indicator
-
-                    try {
-                        const key = await window.pywebview.api.capture_key_for(keyName);
-                        btn.textContent = key; // update to new key
-                    } catch(err) {
-                        console.error(`Failed to capture key: ${keyName}`, err);
-                    } finally {
-                        btn.classList.remove("border-green-500");
-                    }
-                };
-            }
-        }
-
-        // Refresh button
-        refreshBtn.onclick = async () => {
-            await loadDaily();
-            await loadSummary();
-        };
-
-        window.addEventListener('pywebviewready', async () => {
-            await loadDaily();
-            await loadSummary();
-            await initKeyButtons();
-
-
-            const res = await window.pywebview.api.get_resolution();
-            document.getElementById('resolution').value = res;
-
-            const bait = await window.pywebview.api.get_auto_bait();
-            document.getElementById('auto-bait').value = bait;
-
-            const rod = await window.pywebview.api.get_auto_rod();
-            document.getElementById('auto-rods').value = rod;
-
-            for (let k of keybinds) {
-                const select = document.getElementById(k);
-                if (!select) continue;
-
-                select.innerHTML = '';
-                allKeys.forEach(key => {
-                    const opt = document.createElement('option');
-                    opt.value = key;
-                    opt.text = key;
-                    select.appendChild(opt);
-                });
-
-                try {
-                    const val = await window.pywebview.api[`get_${k.replace('-', '_')}`]();
-                    if (val) select.value = val.toUpperCase();
-                } catch(err) {
-                    console.error('Failed to get key', k, err);
-                }
-
-                select.onchange = async (e) => {
-                    try {
-                        await window.pywebview.api[`set_${k.replace('-', '_')}`](e.target.value);
-                    } catch(err) {
-                        console.error('Failed to set key', k, err);
-                    }
-                };
-            }
-        });
-
-    </script>
-
-  </body>
+    </div>
 
 <script>
 const allKeys = [
