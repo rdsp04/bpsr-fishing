@@ -35,7 +35,7 @@ CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 session_stats = {"catches": 0, "misses": 0, "xp": 0, "rate": 0.0}
-from src.utils.keybinds import get_keys,key_to_str, get_pykey
+from src.utils.keybinds import get_keys, key_to_str, get_pykey
 from src.utils.path import get_data_dir
 
 START_KEY, STOP_KEY = get_keys()
@@ -134,6 +134,7 @@ def handle_stop_key():
     else:
         print("No active session to stop.")
 
+
 def on_press(key):
     pressed_str = key_to_str(key)
     start_key_str, stop_key_str = map(key_to_str, get_keys())
@@ -142,7 +143,6 @@ def on_press(key):
         handle_start_key()
     elif pressed_str == stop_key_str:
         handle_stop_key()
-
 
 
 # ---------------- Window Handling ----------------
@@ -451,12 +451,10 @@ def main():
             time.sleep(0.1)
             continue
 
-        print(time.time() - last_progress_time)
         if time.time() - last_progress_time > NO_PROGRESS_LIMIT:
             handle_no_progress_loop(window_title)
 
         rect = get_window_rect(window_title)
-        print(time.time() - last_progress_time > NO_PROGRESS_LIMIT)
 
         default_found = image_service.find_image_in_window(
             rect,
