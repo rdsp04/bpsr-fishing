@@ -5,7 +5,8 @@ from tabulate import tabulate
 from pathlib import Path
 from src.fish.fish_service import FishService
 from src.utils.path import get_data_dir
-from src.utils.keybinds import resolve_key, key_to_str, set_key, get_key, DEFAULT_KEYS
+from src.utils.keybinds import resolve_key, key_to_str, set_key, get_key, DEFAULT_KEYS, capture_and_set_key
+
 
 BASE = get_data_dir()
 FISH_FILE = BASE / "logs/fishing_log.json"
@@ -282,51 +283,24 @@ class StatsApi:
         resolved = resolve_key(key_str)
         if not resolved:
             raise ValueError(f"Invalid key: {key_str}")
-        setattr(self, name, resolved)
-        set_key(name, key_str)
+        self.keys[name] = resolved
         self._settings[name] = key_str
+        set_key(name, key_str)
         self._save_settings()
         return key_str
 
-    def _get_key(self, name: str):
-        return key_to_str(getattr(self, name))
+    def get_key(self, name: str):
+        if name not in DEFAULT_KEYS:
+            raise ValueError(f"Invalid key name: {name}")
+        return get_key(name)
 
-    def set_start_key(self, key_str):
-        return self._set_key("start_key", key_str)
 
-    def get_start_key(self):
-        return self._get_key("start_key")
-
-    def set_stop_key(self, key_str):
-        return self._set_key("stop_key", key_str)
-
-    def get_stop_key(self):
-        return self._get_key("stop_key")
-
-    def set_fish_key(self, key_str):
-        return self._set_key("fish_key", key_str)
-
-    def get_fish_key(self):
-        return self._get_key("fish_key")
-
-    def set_bait_key(self, key_str):
-        return self._set_key("bait_key", key_str)
-
-    def get_bait_key(self):
-        return self._get_key("bait_key")
-
-    def set_rods_key(self, key_str):
-        return self._set_key("rods_key", key_str)
-
-    def get_rods_key(self):
-        return self._get_key("rods_key")
-
-    def set_esc_key(self, key_str):
-        return self._set_key("esc_key", key_str)
-
-    def get_esc_key(self):
-        return self._get_key("esc_key")
-
+    def capture_key_for(self, name: str):
+        if name not in DEFAULT_KEYS:
+            raise ValueError(f"Invalid key name: {name}")
+        key_str = capture_and_set_key(name)
+        return key_str
+    # --- Stats functions ---
     def get_daily_table(self):
         return self.stats.get_all_daily_tables()
 

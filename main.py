@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 import win32gui
 from pynput.mouse import Controller, Button
-from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode
+from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode, Key
 import pyautogui
 
 from src.utils.updater import check_for_update, download_update, run_update, UpdateApi
@@ -35,7 +35,7 @@ CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 session_stats = {"catches": 0, "misses": 0, "xp": 0, "rate": 0.0}
-from src.utils.keybinds import get_keys, set_keys
+from src.utils.keybinds import get_keys, key_to_str, get_pykey
 from src.utils.path import get_data_dir
 
 START_KEY, STOP_KEY = get_keys()
@@ -136,13 +136,13 @@ def handle_stop_key():
 
 
 def on_press(key):
-    print(f"Key pressed: {key}")
+    pressed_str = key_to_str(key)
+    start_key_str, stop_key_str = map(key_to_str, get_keys())
 
-    if key == START_KEY:
+    if pressed_str == start_key_str:
         handle_start_key()
-    elif key == STOP_KEY:
+    elif pressed_str == stop_key_str:
         handle_stop_key()
-
 
 
 # ---------------- Window Handling ----------------
@@ -439,7 +439,7 @@ restart_flag = False
 def main():
     global macro_start_event, last_progress_time, restart_flag
     window_title = select_window()
-    print(f"Macro waiting for START key ({START_KEY})")
+    print(f"Macro waiting for START key ({get_keys()[0]})")
     last_progress_time = time.time()
 
     listener = Listener(on_press=on_press)
@@ -451,12 +451,10 @@ def main():
             time.sleep(0.1)
             continue
 
-        print(time.time() - last_progress_time)
         if time.time() - last_progress_time > NO_PROGRESS_LIMIT:
             handle_no_progress_loop(window_title)
 
         rect = get_window_rect(window_title)
-        print(time.time() - last_progress_time > NO_PROGRESS_LIMIT)
 
         default_found = image_service.find_image_in_window(
             rect,
@@ -491,7 +489,7 @@ def main():
                 last_progress_time = time.time()
 
                 log_broken_rod()
-                press_key("m")
+                press_key(get_pykey("rods_key"))
                 time.sleep(0.2)
                 use_rod = image_service.find_image_in_window(
                     rect,
@@ -592,10 +590,10 @@ def handle_no_progress_loop(window_title):
         # Perform recovery actions
         print("No progress detected, performing recovery actions...")
         if esc_key:
-            press_key(esc_key)
+            press_key(get_pykey("esc_key"))
             time.sleep(1)
         if fish_key:
-            press_key(fish_key)
+            press_key(get_pykey("fish_key"))
             time.sleep(1)
 
         last_progress_time = time.time()
@@ -623,4 +621,4 @@ if __name__ == "__main__":
         start_ui()
     finally:
         print("App is closing, cleaning up...")
-        on_press(STOP_KEY)
+        handle_stop_key()

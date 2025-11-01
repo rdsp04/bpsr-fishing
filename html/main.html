@@ -458,108 +458,205 @@
 
 </head>
 
-<body>
-    <div class="brand">
-        <div class="glow"></div>
-        <div class="logo-text" id="logo-text">🐟 BPSR FISHING</div>
-    </div>
-
-    <div class="navbar">
-        <button id="tab-daily" class="nav-btn active"><i class="fa-solid fa-scroll"></i> Daily</button>
-        <button id="tab-summary" class="nav-btn"><i class="fa-solid fa-fish-fins"></i> Summary</button>
-        <button id="tab-settings" class="nav-btn"><i class="fa-solid fa-gear"></i> Settings</button>
-        <button id="reset-btn" class="nav-btn" title="Reset Interface"><i class="fa-solid fa-rotate-right"></i></button>
-    </div>
-
-    <div class="wrap">
-        <div id="page-settings" class="settings-panel" style="display:none;">
-            <div class="settings-head">
-                <div class="settings-title">Settings</div>
-                <div class="resolution-wrapper">
-                    <label for="resolution">Resolution</label>
-                    <select id="resolution">
-                        <option value="1920x1080">1920×1080</option>
-                        <option value="1600x900">1600×900</option>
-                    </select>
-                    <div id="res-pill" class="res-pill">1920×1080</div>
-                </div>
-            </div>
-
-            <div class="settings-grid">
-
-                <div class="field">
-                    <label>Auto Bait</label>
-                    <button id="auto-bait-btn" class="key-btn locked" disabled>T1</button>
-                </div>
-
-                <div class="field">
-                    <label>Auto Rods</label>
-                    <button id="auto-rods-btn" class="key-btn locked" disabled>T1</button>
-                </div>
-
-
-                <div class="field">
-                    <label>Start Key</label>
-                    <button id="start-key-btn" class="key-btn">F9</button>
-                </div>
-
-                <div class="field">
-                    <label>Stop Key</label>
-                    <button id="stop-key-btn" class="key-btn">F10</button>
-                </div>
-
-                <div class="field">
-                    <label>Fish Key</label>
-                    <button id="fish-key-btn" class="key-btn">F</button>
-                </div>
-
-                <div class="field">
-                    <label>Bait Key</label>
-                    <button id="bait-key-btn" class="key-btn">N</button>
-                </div>
-
-                <div class="field">
-                    <label>Rods Key</label>
-                    <button id="rods-key-btn" class="key-btn">M</button>
-                </div>
-
-                <div class="field">
-                    <label>Escape Key</label>
-                    <button id="esc-key-btn" class="key-btn">ESC</button>
-                </div>
-
-            </div>
-
-
-            <div style="margin-top:28px;padding:20px;border-radius:14px;background:linear-gradient(180deg,rgba(10,40,60,0.35),rgba(0,20,40,0.35));border:1px solid rgba(56,198,255,0.1);text-align:center;color:#8fcfff;font-size:15px;font-weight:600;letter-spacing:1px;">
-                💧 More features coming soon...
-            </div>
+        <div>
+          <label for="auto-rods">Auto Rods Purchase</label>
+          <select id="auto-rods" disabled>
+            <option value="T1" selected>T1</option>
+            <option value="T2">T2</option>
+            <option value="T3">T3</option>
+          </select>
+        </div>
+        <div>
+          <label>Start Keybind</label>
+          <button id="start_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">/</button>
         </div>
 
-        <div id="page-daily">
-            <div id="daily-tables"></div>
+        <div>
+          <label>Stop Keybind</label>
+          <button id="stop_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">.</button>
         </div>
 
-        <div id="page-summary" style="display:none;">
-            <div id="summary-tables" class="summary-panel">
-                <div class="overall-stats-section">
-                    <h3 class="section-title">Overall Stats</h3>
-                    <div id="overall-stats" class="overall-stats"></div>
-                </div>
-                <div class="section-gap"></div>
-                <div class="fish-types-section">
-                    <h3 class="section-title">Fish Types</h3>
-                    <div id="fish-list" class="fish-list"></div>
-                </div>
-            </div>
+        <div>
+          <label>Fish Key</label>
+          <button id="fish_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">F</button>
         </div>
 
+        <div>
+          <label>Bait Key</label>
+          <button id="bait_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">N</button>
+        </div>
 
+        <div>
+          <label>Rods Key</label>
+          <button id="rods_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">M</button>
+        </div>
+
+        <div>
+          <label>Escape Key</label>
+          <button id="esc_key-btn"
+            class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">ESC</button>
+        </div>
 
     </div>
     </div>
 
-    </div>
+    <script>
+        const allKeys = [
+          'A','B','C','D','E','F','G','H','I','J','K','L','M',
+          'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+          '0','1','2','3','4','5','6','7','8','9',
+          'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+          'ESC','TAB','CAPSLOCK','SHIFT','CTRL','ALT','SPACE','ENTER','BACKSPACE',
+          'INSERT','DELETE','HOME','END','PAGEUP','PAGEDOWN','LEFT','UP','RIGHT','DOWN',
+          '`','-','=','[',']','\\',';','\'',',','.','/','~','!','@','#','$','%','^','&','*','(',')','_','+','{','}','|',':','"','<','>','?'
+        ];
+
+
+
+        const dailyTab = document.getElementById('tab-daily');
+        const summaryTab = document.getElementById('tab-summary');
+        const settingsTab = document.getElementById('tab-settings');
+        const refreshBtn = document.getElementById('btn-refresh');
+        const dailyPage = document.getElementById('page-daily');
+        const summaryPage = document.getElementById('page-summary');
+        const settingsPage = document.getElementById('page-settings');
+
+        async function loadDaily() {
+            const dailyHtml = await window.pywebview.api.get_daily_table();
+            document.getElementById('daily-tables').innerHTML = dailyHtml;
+        }
+
+        async function loadSummary() {
+            const summaryHtml = await window.pywebview.api.get_overall_summary();
+            document.getElementById('summary-tables').innerHTML = summaryHtml;
+        }
+
+        dailyTab.onclick = async () => {
+            await loadDaily();
+            dailyPage.classList.remove('hidden');
+            summaryPage.classList.add('hidden');
+            settingsPage.classList.add('hidden');
+        };
+
+        summaryTab.onclick = async () => {
+            await loadSummary();
+            dailyPage.classList.add('hidden');
+            summaryPage.classList.remove('hidden');
+            settingsPage.classList.add('hidden');
+        };
+
+        settingsTab.onclick = () => {
+            dailyPage.classList.add('hidden');
+            summaryPage.classList.add('hidden');
+            settingsPage.classList.remove('hidden');
+        };
+
+        // Save settings when changed
+        document.getElementById('resolution').onchange = async (e) => {
+            await window.pywebview.api.set_resolution(e.target.value);
+        };
+        document.getElementById('auto-bait').onchange = async (e) => {
+            await window.pywebview.api.set_auto_bait(e.target.value);
+        };
+        document.getElementById('auto-rods').onchange = async (e) => {
+            await window.pywebview.api.set_auto_rod(e.target.value);
+        };
+        const keyButtons = [
+            "start_key",
+            "stop_key",
+            "fish_key",
+            "bait_key",
+            "rods_key",
+            "esc_key"
+        ];
+
+        async function initKeyButtons() {
+            for (let keyName of keyButtons) {
+                const btn = document.getElementById(`${keyName}-btn`);
+                if (!btn) continue;
+
+                // Load initial key from Python
+                try {
+                    const val = await window.pywebview.api.get_key(keyName);
+                    btn.textContent = val || "Unset";
+                } catch(err) {
+                    console.error(`Failed to get key: ${keyName}`, err);
+                    btn.textContent = "Unset"; // fallback
+                }
+
+                btn.onclick = async () => {
+                    btn.classList.add("border-green-500"); // listening indicator
+
+                    try {
+                        const key = await window.pywebview.api.capture_key_for(keyName);
+                        btn.textContent = key; // update to new key
+                    } catch(err) {
+                        console.error(`Failed to capture key: ${keyName}`, err);
+                    } finally {
+                        btn.classList.remove("border-green-500");
+                    }
+                };
+            }
+        }
+
+        // Refresh button
+        refreshBtn.onclick = async () => {
+            await loadDaily();
+            await loadSummary();
+        };
+
+        window.addEventListener('pywebviewready', async () => {
+            await loadDaily();
+            await loadSummary();
+            await initKeyButtons();
+
+
+            const res = await window.pywebview.api.get_resolution();
+            document.getElementById('resolution').value = res;
+
+            const bait = await window.pywebview.api.get_auto_bait();
+            document.getElementById('auto-bait').value = bait;
+
+            const rod = await window.pywebview.api.get_auto_rod();
+            document.getElementById('auto-rods').value = rod;
+
+            for (let k of keybinds) {
+                const select = document.getElementById(k);
+                if (!select) continue;
+
+                select.innerHTML = '';
+                allKeys.forEach(key => {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.text = key;
+                    select.appendChild(opt);
+                });
+
+                try {
+                    const val = await window.pywebview.api[`get_${k.replace('-', '_')}`]();
+                    if (val) select.value = val.toUpperCase();
+                } catch(err) {
+                    console.error('Failed to get key', k, err);
+                }
+
+                select.onchange = async (e) => {
+                    try {
+                        await window.pywebview.api[`set_${k.replace('-', '_')}`](e.target.value);
+                    } catch(err) {
+                        console.error('Failed to set key', k, err);
+                    }
+                };
+            }
+        });
+
+    </script>
+
+  </body>
 
 <script>
 const allKeys = [

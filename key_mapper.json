@@ -1,0 +1,634 @@
+[
+  {
+    "key": "Key.alt",
+    "name": "ALT"
+  },
+  {
+    "key": "Key.alt_gr",
+    "name": "ALT_GR"
+  },
+  {
+    "key": "Key.alt_l",
+    "name": "ALT_L"
+  },
+  {
+    "key": "Key.alt_r",
+    "name": "ALT_R"
+  },
+  {
+    "key": "Key.backspace",
+    "name": "BACKSPACE"
+  },
+  {
+    "key": "Key.caps_lock",
+    "name": "CAPS_LOCK"
+  },
+  {
+    "key": "Key.cmd",
+    "name": "CMD"
+  },
+  {
+    "key": "Key.cmd_r",
+    "name": "CMD_R"
+  },
+  {
+    "key": "Key.ctrl",
+    "name": "CTRL"
+  },
+  {
+    "key": "Key.ctrl_l",
+    "name": "CTRL_L"
+  },
+  {
+    "key": "Key.ctrl_r",
+    "name": "CTRL_R"
+  },
+  {
+    "key": "Key.delete",
+    "name": "DELETE"
+  },
+  {
+    "key": "Key.down",
+    "name": "DOWN"
+  },
+  {
+    "key": "Key.end",
+    "name": "END"
+  },
+  {
+    "key": "Key.enter",
+    "name": "ENTER"
+  },
+  {
+    "key": "Key.esc",
+    "name": "ESC"
+  },
+  {
+    "key": "Key.f1",
+    "name": "F1"
+  },
+  {
+    "key": "Key.f10",
+    "name": "F10"
+  },
+  {
+    "key": "Key.f11",
+    "name": "F11"
+  },
+  {
+    "key": "Key.f12",
+    "name": "F12"
+  },
+  {
+    "key": "Key.f13",
+    "name": "F13"
+  },
+  {
+    "key": "Key.f14",
+    "name": "F14"
+  },
+  {
+    "key": "Key.f15",
+    "name": "F15"
+  },
+  {
+    "key": "Key.f16",
+    "name": "F16"
+  },
+  {
+    "key": "Key.f17",
+    "name": "F17"
+  },
+  {
+    "key": "Key.f18",
+    "name": "F18"
+  },
+  {
+    "key": "Key.f19",
+    "name": "F19"
+  },
+  {
+    "key": "Key.f2",
+    "name": "F2"
+  },
+  {
+    "key": "Key.f20",
+    "name": "F20"
+  },
+  {
+    "key": "Key.f21",
+    "name": "F21"
+  },
+  {
+    "key": "Key.f22",
+    "name": "F22"
+  },
+  {
+    "key": "Key.f23",
+    "name": "F23"
+  },
+  {
+    "key": "Key.f24",
+    "name": "F24"
+  },
+  {
+    "key": "Key.f3",
+    "name": "F3"
+  },
+  {
+    "key": "Key.f4",
+    "name": "F4"
+  },
+  {
+    "key": "Key.f5",
+    "name": "F5"
+  },
+  {
+    "key": "Key.f6",
+    "name": "F6"
+  },
+  {
+    "key": "Key.f7",
+    "name": "F7"
+  },
+  {
+    "key": "Key.f8",
+    "name": "F8"
+  },
+  {
+    "key": "Key.f9",
+    "name": "F9"
+  },
+  {
+    "key": "Key.home",
+    "name": "HOME"
+  },
+  {
+    "key": "Key.insert",
+    "name": "INSERT"
+  },
+  {
+    "key": "Key.left",
+    "name": "LEFT"
+  },
+  {
+    "key": "Key.media_next",
+    "name": "MEDIA_NEXT"
+  },
+  {
+    "key": "Key.media_play_pause",
+    "name": "MEDIA_PLAY_PAUSE"
+  },
+  {
+    "key": "Key.media_previous",
+    "name": "MEDIA_PREVIOUS"
+  },
+  {
+    "key": "Key.media_stop",
+    "name": "MEDIA_STOP"
+  },
+  {
+    "key": "Key.media_volume_down",
+    "name": "MEDIA_VOLUME_DOWN"
+  },
+  {
+    "key": "Key.media_volume_mute",
+    "name": "MEDIA_VOLUME_MUTE"
+  },
+  {
+    "key": "Key.media_volume_up",
+    "name": "MEDIA_VOLUME_UP"
+  },
+  {
+    "key": "Key.menu",
+    "name": "MENU"
+  },
+  {
+    "key": "Key.num_lock",
+    "name": "NUM_LOCK"
+  },
+  {
+    "key": "Key.page_down",
+    "name": "PAGE_DOWN"
+  },
+  {
+    "key": "Key.page_up",
+    "name": "PAGE_UP"
+  },
+  {
+    "key": "Key.pause",
+    "name": "PAUSE"
+  },
+  {
+    "key": "Key.print_screen",
+    "name": "PRINT_SCREEN"
+  },
+  {
+    "key": "Key.right",
+    "name": "RIGHT"
+  },
+  {
+    "key": "Key.scroll_lock",
+    "name": "SCROLL_LOCK"
+  },
+  {
+    "key": "Key.shift",
+    "name": "SHIFT"
+  },
+  {
+    "key": "Key.shift_r",
+    "name": "SHIFT_R"
+  },
+  {
+    "key": "Key.space",
+    "name": "SPACE"
+  },
+  {
+    "key": "Key.tab",
+    "name": "TAB"
+  },
+  {
+    "key": "Key.up",
+    "name": "UP"
+  },
+  {
+    "key": "0",
+    "name": "0"
+  },
+  {
+    "key": "1",
+    "name": "1"
+  },
+  {
+    "key": "2",
+    "name": "2"
+  },
+  {
+    "key": "3",
+    "name": "3"
+  },
+  {
+    "key": "4",
+    "name": "4"
+  },
+  {
+    "key": "5",
+    "name": "5"
+  },
+  {
+    "key": "6",
+    "name": "6"
+  },
+  {
+    "key": "7",
+    "name": "7"
+  },
+  {
+    "key": "8",
+    "name": "8"
+  },
+  {
+    "key": "9",
+    "name": "9"
+  },
+  {
+    "key": "a",
+    "name": "a"
+  },
+  {
+    "key": "b",
+    "name": "b"
+  },
+  {
+    "key": "c",
+    "name": "c"
+  },
+  {
+    "key": "d",
+    "name": "d"
+  },
+  {
+    "key": "e",
+    "name": "e"
+  },
+  {
+    "key": "f",
+    "name": "f"
+  },
+  {
+    "key": "g",
+    "name": "g"
+  },
+  {
+    "key": "h",
+    "name": "h"
+  },
+  {
+    "key": "i",
+    "name": "i"
+  },
+  {
+    "key": "j",
+    "name": "j"
+  },
+  {
+    "key": "k",
+    "name": "k"
+  },
+  {
+    "key": "l",
+    "name": "l"
+  },
+  {
+    "key": "m",
+    "name": "m"
+  },
+  {
+    "key": "n",
+    "name": "n"
+  },
+  {
+    "key": "o",
+    "name": "o"
+  },
+  {
+    "key": "p",
+    "name": "p"
+  },
+  {
+    "key": "q",
+    "name": "q"
+  },
+  {
+    "key": "r",
+    "name": "r"
+  },
+  {
+    "key": "s",
+    "name": "s"
+  },
+  {
+    "key": "t",
+    "name": "t"
+  },
+  {
+    "key": "u",
+    "name": "u"
+  },
+  {
+    "key": "v",
+    "name": "v"
+  },
+  {
+    "key": "w",
+    "name": "w"
+  },
+  {
+    "key": "x",
+    "name": "x"
+  },
+  {
+    "key": "y",
+    "name": "y"
+  },
+  {
+    "key": "z",
+    "name": "z"
+  },
+  {
+    "key": "A",
+    "name": "A"
+  },
+  {
+    "key": "B",
+    "name": "B"
+  },
+  {
+    "key": "C",
+    "name": "C"
+  },
+  {
+    "key": "D",
+    "name": "D"
+  },
+  {
+    "key": "E",
+    "name": "E"
+  },
+  {
+    "key": "F",
+    "name": "F"
+  },
+  {
+    "key": "G",
+    "name": "G"
+  },
+  {
+    "key": "H",
+    "name": "H"
+  },
+  {
+    "key": "I",
+    "name": "I"
+  },
+  {
+    "key": "J",
+    "name": "J"
+  },
+  {
+    "key": "K",
+    "name": "K"
+  },
+  {
+    "key": "L",
+    "name": "L"
+  },
+  {
+    "key": "M",
+    "name": "M"
+  },
+  {
+    "key": "N",
+    "name": "N"
+  },
+  {
+    "key": "O",
+    "name": "O"
+  },
+  {
+    "key": "P",
+    "name": "P"
+  },
+  {
+    "key": "Q",
+    "name": "Q"
+  },
+  {
+    "key": "R",
+    "name": "R"
+  },
+  {
+    "key": "S",
+    "name": "S"
+  },
+  {
+    "key": "T",
+    "name": "T"
+  },
+  {
+    "key": "U",
+    "name": "U"
+  },
+  {
+    "key": "V",
+    "name": "V"
+  },
+  {
+    "key": "W",
+    "name": "W"
+  },
+  {
+    "key": "X",
+    "name": "X"
+  },
+  {
+    "key": "Y",
+    "name": "Y"
+  },
+  {
+    "key": "Z",
+    "name": "Z"
+  },
+  {
+    "key": "!",
+    "name": "!"
+  },
+  {
+    "key": "\"",
+    "name": "\""
+  },
+  {
+    "key": "#",
+    "name": "#"
+  },
+  {
+    "key": "$",
+    "name": "$"
+  },
+  {
+    "key": "%",
+    "name": "%"
+  },
+  {
+    "key": "&",
+    "name": "&"
+  },
+  {
+    "key": "'",
+    "name": "'"
+  },
+  {
+    "key": "(",
+    "name": "("
+  },
+  {
+    "key": ")",
+    "name": ")"
+  },
+  {
+    "key": "*",
+    "name": "*"
+  },
+  {
+    "key": "+",
+    "name": "+"
+  },
+  {
+    "key": ",",
+    "name": ","
+  },
+  {
+    "key": "-",
+    "name": "-"
+  },
+  {
+    "key": ".",
+    "name": "."
+  },
+  {
+    "key": "/",
+    "name": "/"
+  },
+  {
+    "key": ":",
+    "name": ":"
+  },
+  {
+    "key": ";",
+    "name": ";"
+  },
+  {
+    "key": "<",
+    "name": "<"
+  },
+  {
+    "key": "=",
+    "name": "="
+  },
+  {
+    "key": ">",
+    "name": ">"
+  },
+  {
+    "key": "?",
+    "name": "?"
+  },
+  {
+    "key": "@",
+    "name": "@"
+  },
+  {
+    "key": "[",
+    "name": "["
+  },
+  {
+    "key": "\\",
+    "name": "\\"
+  },
+  {
+    "key": "]",
+    "name": "]"
+  },
+  {
+    "key": "^",
+    "name": "^"
+  },
+  {
+    "key": "_",
+    "name": "_"
+  },
+  {
+    "key": "`",
+    "name": "`"
+  },
+  {
+    "key": "{",
+    "name": "{"
+  },
+  {
+    "key": "|",
+    "name": "|"
+  },
+  {
+    "key": "}",
+    "name": "}"
+  },
+  {
+    "key": "~",
+    "name": "~"
+  },
+  {
+    "key": " ",
+    "name": " "
+  }
+]
