@@ -1,166 +1,462 @@
 <!DOCTYPE html>
-<html>
+<html lang="cs">
 
-  <head>
-    <meta charset="utf-8">
-    <script src="https://kit.fontawesome.com/fc0cae2ea4.js"
-      crossorigin="anonymous"></script>
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap"
-      rel="stylesheet">
-    <title>Fisher Stats</title>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BPSR Fishing — Aqua Dashboard</title>
+
+    <script src="https://kit.fontawesome.com/fc0cae2ea4.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Viga&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-
-        html {
-        overflow: hidden;
+        :root {
+          --bg-very-dark: #071426;
+          --panel-dark: #0b2430;
+          --aqua: #38c6ff;
+          --text: #e6f7ff;
+          --muted: #9fbfcc;
+          --pill-bg: rgba(255,255,255,0.06);
+          --input-bg: rgba(0,0,0,0.35);
+          --border: rgba(255,255,255,0.03);
+        }
+        
+        html, body {
+          height: 100%;
+          margin: 0;
+          background: linear-gradient(180deg,#001523 0%, #041022 100%);
+          font-family: 'Viga', sans-serif;
+          color: var(--text);
+          overflow-x: hidden;
+          position: relative;
+        }
+        
+        body::before {
+          content: "";
+          position: fixed;
+          top: 0; left: 0;
+          width: 200%; height: 200%;
+          background:
+            radial-gradient(circle at 25% 25%, rgba(56,198,255,0.06) 0%, transparent 20%),
+            radial-gradient(circle at 75% 75%, rgba(38,160,255,0.04) 0%, transparent 18%);
+          animation: waterFlow 30s linear infinite;
+          transform: translate(-25%, -25%) scale(1.2);
+          filter: blur(60px);
+          z-index: 0;
+          pointer-events: none;
+        }
+        
+        @keyframes waterFlow {
+          0% { transform: translate(-25%, -25%) scale(1.2) rotate(0deg); }
+          50% { transform: translate(-30%, -20%) scale(1.25) rotate(180deg); }
+          100% { transform: translate(-25%, -25%) scale(1.2) rotate(360deg); }
+        }
+        
+        @keyframes floaty {
+          0%, 100% { text-shadow: 0 0 8px rgba(56,198,255,0.5), 0 0 20px rgba(56,198,255,0.25); }
+          50% { text-shadow: 0 0 14px rgba(56,198,255,0.7), 0 0 32px rgba(56,198,255,0.4); }
+        }
+        
+        @keyframes glowPulse {
+          0%, 100% { text-shadow: 0 0 10px #5de3ff, 0 0 20px #5de3ff; }
+          50% { text-shadow: 0 0 20px #3db8e8, 0 0 30px #3db8e8; }
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .brand {
+          position: fixed;
+          top: 18px;
+          left: 28px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 140;
+          pointer-events: none;
+        }
+        
+        .brand .logo-text {
+          font-size: 30px;
+          font-weight: 700;
+          color: var(--aqua);
+          text-shadow: 0 0 6px rgba(56,198,255,0.25),
+                       0 6px 22px rgba(2,10,20,0.6);
+          animation: floaty 6s ease-in-out infinite;
+        }
+        
+        .brand .glow {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          transform: translate(-30%, -50%);
+          width: 240px;
+          height: 48px;
+          border-radius: 20px;
+          filter: blur(22px);
+          background: radial-gradient(closest-side, rgba(56,198,255,0.12), transparent 60%);
+          opacity: 0.9;
+          animation: glowPulse 3.6s ease-in-out infinite;
+        }
+        
+        .navbar {
+          position: fixed;
+          top: 20px;
+          right: 36px;
+          display:flex;
+          gap:10px;
+          z-index:120;
+        }
+        
+        .nav-btn {
+          background: rgba(0,0,0,0.25);
+          border:1px solid rgba(255,255,255,0.03);
+          color:var(--text);
+          padding:8px 12px;
+          border-radius:10px;
+          cursor:pointer;
+          font-size:14px;
+          display:inline-flex;
+          gap:8px;
+          align-items:center;
+          transition:all 0.18s ease;
+        }
+        
+        .nav-btn.active {
+          background: linear-gradient(90deg, rgba(56,198,255,0.12), rgba(2,90,180,0.06));
+          border-color: rgba(56,198,255,0.45);
+        }
+        
+        #reset-btn {
+          padding: 8px 10px;
+          width: 42px;
+          display: flex;
+          justify-content: center;
+        }
+        
+        #reset-btn:hover i {
+          transform: rotate(-90deg);
+          transition: transform 0.3s ease;
+        }
+        
+        .wrap {
+          max-width:1150px;
+          margin:110px auto 60px;
+          padding:20px;
+          position:relative;
+          z-index:10;
+        }
+        
+        .settings-panel {
+          background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
+          border-radius:14px;
+          padding:32px 22px 22px;
+          border:1px solid rgba(255,255,255,0.02);
+          box-shadow: 0 10px 30px rgba(0,20,40,0.45);
+          backdrop-filter: blur(6px);
+        }
+        
+        .settings-title {
+          margin-top: 8px;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--aqua);
+          text-shadow: 0 0 6px rgba(56,198,255,0.25),
+                       0 6px 22px rgba(2,10,20,0.6);
+          animation: floaty 6s ease-in-out infinite;
+        }
+        
+        .summary-panel {
+          background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
+          border-radius: 14px;
+          padding: 32px 22px 22px;
+          border: 1px solid rgba(255,255,255,0.02);
+          box-shadow: 0 10px 30px rgba(0,20,40,0.45);
+          backdrop-filter: blur(6px);
+          color: var(--text);
+          animation: fadeIn 1s ease-in-out;
+        }
+        
+        .summary-panel h3 {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--aqua);
+          text-shadow: 0 0 10px rgba(56,198,255,0.5),
+                       0 0 25px rgba(56,198,255,0.3);
+          animation: floaty 6s ease-in-out infinite;
+          margin-bottom: 10px;
+          letter-spacing: 0.5px;
+        }
+        
+        .summary-panel table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+          background: rgba(0, 10, 20, 0.35);
+          border-radius: 12px;
+          overflow: hidden;
+        }
+        
+        .summary-panel th {
+          text-align: center;
+          font-weight: bold;
+          color: #3b82f6;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          padding: 10px 15px;
+        }
+        
+        .summary-panel td {
+          padding: 8px 15px;
+          color: #e6f7ff;
+          text-align: right;
+          transition: background 0.3s, color 0.3s;
+        }
+        
+        /* první sloupec vlevo */
+        .summary-panel td:first-child,
+        .summary-panel th:first-child {
+          text-align: left !important;
+        }
+        
+        .summary-panel tr:hover td {
+          background: linear-gradient(90deg, rgba(93,227,255,0.15), rgba(20,80,120,0.15));
+          color: #c2faff;
+          box-shadow: 0 0 10px rgba(93,227,255,0.15);
+        }
+        
+        .fish-row, .fish-entry {
+          display: flex;
+          justify-content: space-between;
+          color: #3b82f6;
+          padding: 4px 12px;
+        }
+        
+        .fish-name {
+          font-weight: 500;
+        }
+        
+        .fish-count {
+          font-weight: bold;
+        }
+        
+        .summary-panel table th {
+          color: #aeeaff !important;
+          text-align: center !important;
+        }
+        
+        .summary-panel table td {
+          text-align: center !important;
+        }
+        
+        /* první sloupec vlevo */
+        .summary-panel table td:first-child,
+        .summary-panel table th:first-child {
+          text-align: center !important;
+        }
+        
+        .settings-panel table,
+        .settings-panel th,
+        .settings-panel td {
+          text-align: left !important;
+          color: var(--text) !important;
+        }
+        
+        .settings-panel td:last-child {
+          text-align: right !important;
+        }
+        
+        .settings-panel td {
+          padding: 6px 12px;
+        }
+        
+        .settings-panel label,
+        .settings-panel select {
+          text-align: left !important;
+          color: #e6f7ff;
+        }
+        
+        .settings-panel .field {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        
+        .settings-panel select {
+          background: rgba(0, 20, 40, 0.35);
+          border: 1px solid rgba(56,198,255,0.25);
+          border-radius: 8px;
+          padding: 6px 8px;
+          color: #bde8ff;
+          width: 120px;
+        }
+        
+        .settings-panel {
+          background: linear-gradient(180deg, rgba(6,18,30,0.7), rgba(3,10,18,0.7));
+          border-radius: 14px;
+          padding: 32px 22px 22px;
+          border: 1px solid rgba(255,255,255,0.02);
+          box-shadow: 0 10px 30px rgba(0,20,40,0.45);
+          backdrop-filter: blur(6px);
+          color: var(--text);
+        }
+        
+        .settings-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+        }
+        
+        .settings-title {
+          margin-top: 8px;
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--aqua);
+          text-shadow: 0 0 6px rgba(56,198,255,0.25),
+                       0 6px 22px rgba(2,10,20,0.6);
+          animation: floaty 6s ease-in-out infinite;
+        }
+        
+        .resolution-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        #resolution {
+          background: rgba(15, 25, 35, 0.8);
+          color: #b4e3ff;
+          border: 1px solid rgba(130, 200, 255, 0.4);
+          border-radius: 10px;
+          padding: 6px 10px;
+          font-size: 15px;
+          font-weight: 500;
+          outline: none;
+          transition: all 0.4s ease;
+          backdrop-filter: blur(4px);
+        }
+        
+        #resolution:hover {
+          background: rgba(25, 45, 65, 0.9);
+          box-shadow: 0 0 8px rgba(130, 200, 255, 0.4);
+          transform: scale(1.03);
         }
 
-        body {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        overflow-y: scroll;
-        background-color: #111;
-        font-family: 'Viga', sans-serif !important;
-
+        .res-pill {
+          background: linear-gradient(90deg, rgba(60,120,200,0.25), rgba(90,150,255,0.35));
+          border: 1px solid rgba(130,200,255,0.5);
+          color: #bde8ff;
+          border-radius: 20px;
+          padding: 6px 14px;
+          font-size: 14px;
+          letter-spacing: 0.4px;
+          font-weight: 500;
+          text-shadow: 0 0 4px rgba(120,180,255,0.8);
+          transition: all 0.4s ease;
+          opacity: 1;
         }
-        #app {
-        height: auto;
-        overflow: visible;
+        
+        .res-pill.fade {
+          opacity: 0;
+          transform: scale(0.9);
         }
-
-        body::-webkit-scrollbar {
-        width: 8px;
+        
+        .settings-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr); 
+          gap: 16px 22px;
+          margin-top: 16px;
+          align-items: center;
         }
-
-        body::-webkit-scrollbar-thumb {
-        background: #0284C7;
-        border-radius: 4px;
+        
+        .settings-grid .field {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
         }
-
-        body::-webkit-scrollbar-thumb:hover {
-        background: #0369A1;
+        
+        .settings-grid label {
+          font-weight: 600;
+          color: #aeeaff;
+          font-size: 14px;
+          letter-spacing: 0.3px;
         }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
+        
+        .settings-grid select {
+          width: 100%;
+          background: rgba(0, 30, 60, 0.25);
+          color: var(--text);
+          border: 1px solid rgba(56,198,255,0.3);
+          border-radius: 10px;
+          padding: 6px 8px;
+          font-size: 14px;
+          transition: all 0.25s ease;
         }
-
-        th,
-        td {
-            padding: 0.5rem;
-            text-align: center;
-            border: 1px solid #222;
+        
+        .settings-grid select:hover {
+          background: rgba(20, 60, 90, 0.35);
+          box-shadow: 0 0 8px rgba(56,198,255,0.2);
         }
-
-        th {
-            background-color: #1a1a1a;
+        
+        /* === RESPONSIVITA === */
+        @media (max-width: 1100px) {
+          .settings-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
-        td {
-            background-color: #111;
+        
+        @media (max-width: 700px) {
+          .settings-grid { grid-template-columns: repeat(1, 1fr); }
         }
-
-        select {
-            background-color: #222;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-
+        
+        
+        /* === RESPONSIVITA === */
+        @media (max-width:1100px) {
+          .settings-grid { grid-template-columns: repeat(2,1fr); }
         }
-
-        label {
-            display: block;
-            margin-top: 0.5rem;
-            margin-bottom: 0.25rem;
+        @media (max-width:700px) {
+          .settings-grid { grid-template-columns: repeat(1,1fr); }
         }
-
-        button {
-            cursor: pointer;
+        
+        .key-btn {
+          width: 80px;
+          height: 40px;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 6px;
+          color: #aeeaff;
+          font-weight: 500;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.15s ease;
         }
-
-        @keyframes bounce {
-        0%, 100% {
-        transform: translateY(-50%);
-        animation-timing-function: cubic-bezier(0.5, 0, 1, 1);
+        
+        .key-btn:hover {
+          background: rgba(0,180,255,0.15);
+          border-color: rgba(0,180,255,0.3);
         }
-        50% {
-        transform: none;
-        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        .key-btn:focus {
+          outline: none;
+          border-color: #00b4ff;
+          background: rgba(0,255,200,0.2);
         }
+        
+        .key-btn.locked {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: #1f2937; 
+          color: #bbb;
+          border: 1px solid #333;
         }
-
+        
+        .key-btn.locked:hover {
+          background: #1f2937;
+        }
     </style>
-  </head>
 
-  <body class="text-white font-sans p-4">
-
-    <div id="app">
-
-      <div class="px-4 flex items-center justify-center gap-2">
-        <h1 class="text-5xl font-bold text-center mb-4">BPSR FISHING</h1>
-        <img class="h-32 w-32"
-          src="https://assets-ng.maxroll.gg/sr-tools/assets/db/icons/items/miscellaneous/item_icons_fishbait04.webp"
-          alt="Icon">
-      </div>
-
-      <!-- Tabs -->
-      <div class="flex gap-2 mb-4 place-content-center font-bold text-xl">
-        <button id="tab-daily"
-          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
-            class="fa-solid fa-scroll"></i> Daily Stats</button>
-        <button id="tab-summary"
-          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
-            class="fa-solid fa-fish-fins"></i> Summary</button>
-        <button id="tab-settings"
-          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
-            class="fa-solid fa-gears"></i> Settings</button>
-        <button id="btn-refresh"
-          class="px-4 py-2 bg-sky-600 rounded-full hover:bg-sky-700 hover:animate-bounce"><i
-            class="fa-solid fa-bug"></i> Refresh</button>
-      </div>
-
-      <!-- Pages -->
-      <div id="page-daily" class="space-y-6 overflow-auto max-h-[80vh]">
-        <div id="daily-tables"></div>
-      </div>
-
-      <div id="page-summary"
-        class="space-y-6 overflow-auto max-h-[80vh] hidden">
-        <div id="summary-tables"></div>
-      </div>
-
-      <div id="page-settings"
-        class="space-y-6 overflow-auto max-h-[80vh] hidden">
-
-        <h2 class="text-xl font-bold">Display</h2>
-
-        <div>
-          <label for="resolution">Resolution</label>
-          <select id="resolution">
-            <option value="1920x1080">1920x1080</option>
-          </select>
-        </div>
-
-        <h2 class="text-xl font-bold">Preferences</h2>
-        <br>
-        <span class="text-sm px-1.5 py-1 bg-red-600 rounded-full"><i
-            class="fa-solid fa-triangle-exclamation"></i> Coming Soon <i
-            class="fa-solid fa-triangle-exclamation"></i></span>
-
-        <div>
-          <label for="auto-bait">Auto Bait Purchase</label>
-          <select id="auto-bait" disabled>
-            <option value="T1" selected>T1</option>
-            <option value="T2">T2</option>
-            <option value="T3">T3</option>
-          </select>
-        </div>
+</head>
 
         <div>
           <label for="auto-rods">Auto Rods Purchase</label>
@@ -206,7 +502,7 @@
             class="rounded w-20 h-10 border border-gray-500 bg-[rgba(255,255,255,0.1)] focus:outline-none">ESC</button>
         </div>
 
-      </div>
+    </div>
     </div>
 
     <script>
@@ -362,4 +658,178 @@
 
   </body>
 
+<script>
+const allKeys = [
+  'A','B','C','D','E','F','G','H','I','J','K','L','M',
+  'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+  '0','1','2','3','4','5','6','7','8','9',
+  'F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12',
+  'ESC','TAB','CAPSLOCK','SHIFT','CTRL','ALT','SPACE','ENTER','BACKSPACE',
+  'INSERT','DELETE','HOME','END','PAGEUP','PAGEDOWN','LEFT','UP','RIGHT','DOWN'
+];
+
+const dailyTab = document.getElementById('tab-daily');
+const summaryTab = document.getElementById('tab-summary');
+const settingsTab = document.getElementById('tab-settings');
+const refreshBtn = document.getElementById('btn-refresh');
+
+const dailyPage = document.getElementById('page-daily');
+const summaryPage = document.getElementById('page-summary');
+const settingsPage = document.getElementById('page-settings');
+
+// === PAGE NAVIGATION ===
+function showPage(page) {
+  dailyPage.style.display = "none";
+  summaryPage.style.display = "none";
+  settingsPage.style.display = "none";
+  dailyTab.classList.remove('active');
+  summaryTab.classList.remove('active');
+  settingsTab.classList.remove('active');
+
+  if (page === 'daily') {
+    dailyPage.style.display = "block";
+    dailyTab.classList.add('active');
+  } else if (page === 'summary') {
+    summaryPage.style.display = "block";
+    summaryTab.classList.add('active');
+  } else if (page === 'settings') {
+    settingsPage.style.display = "block";
+    settingsTab.classList.add('active');
+  }
+}
+
+// === LOAD FUNCTIONS ===
+async function loadDaily() {
+  try {
+    const dailyHtml = await window.pywebview.api.get_daily_table();
+    document.getElementById('daily-tables').innerHTML = dailyHtml;
+  } catch(e) { console.warn('pywebview.get_daily_table failed', e); }
+}
+
+async function loadSummary() {
+  try {
+    const summaryHtml = await window.pywebview.api.get_overall_summary();
+    document.getElementById('summary-tables').innerHTML = summaryHtml;
+  } catch(e) { console.warn('pywebview.get_overall_summary failed', e); }
+}
+
+// === TAB CLICKS ===
+dailyTab.onclick = async () => { await loadDaily(); showPage('daily'); };
+summaryTab.onclick = async () => { await loadSummary(); showPage('summary'); };
+settingsTab.onclick = () => showPage('settings');
+
+// === SETTINGS ===
+document.getElementById('resolution').onchange = async (e) => {
+  try { await window.pywebview.api.set_resolution(e.target.value); } catch(e){}
+  document.getElementById('res-pill').textContent = e.target.value;
+};
+
+// === BUTTON-BASED KEYBIND HANDLING ===
+const keyButtons = {
+  "start-key": "start-key-btn",
+  "stop-key": "stop-key-btn",
+  "fish-key": "fish-key-btn",
+  "bait-key": "bait-key-btn",
+  "rods-key": "rods-key-btn",
+  "esc-key": "esc-key-btn",
+};
+
+async function updateButtonValues() {
+  for (const [key, btnId] of Object.entries(keyButtons)) {
+    const btn = document.getElementById(btnId);
+    try {
+      const val = await window.pywebview.api[`get_${key.replace('-', '_')}`]();
+      if (val) btn.textContent = val.toUpperCase();
+    } catch (e) { console.warn('Failed to get key', key); }
+  }
+
+  try {
+    const bait = await window.pywebview.api.get_auto_bait();
+    const rods = await window.pywebview.api.get_auto_rod();
+    document.getElementById('auto-bait-btn').textContent = bait;
+    document.getElementById('auto-rods-btn').textContent = rods;
+  } catch (e) {}
+}
+
+// === CLICK TO CHANGE KEY ===
+Object.entries(keyButtons).forEach(([key, btnId]) => {
+  const btn = document.getElementById(btnId);
+  btn.addEventListener('click', () => {
+    btn.textContent = '...';
+    btn.style.background = 'rgba(0,180,255,0.25)';
+    btn.style.borderColor = 'rgba(0,180,255,0.5)';
+    btn.blur();
+
+    const keyHandler = async (e) => {
+      e.preventDefault();
+      document.removeEventListener('keydown', keyHandler);
+
+      if (e.key === 'Escape') {
+        // cancel remap
+        await updateButtonValues();
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        return;
+      }
+
+      const pressed = e.key.length === 1 ? e.key.toUpperCase() : e.key.toUpperCase();
+      btn.textContent = pressed;
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      try {
+        await window.pywebview.api[`set_${key.replace('-', '_')}`](pressed);
+      } catch (err) {
+        console.error('Failed to set key', key, err);
+      }
+    };
+
+    document.addEventListener('keydown', keyHandler);
+  });
+});
+
+// === BUTTONS FOR AUTO BUY ===
+document.getElementById('auto-bait-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('auto-bait-btn');
+  const current = btn.textContent;
+  const next = current === 'T1' ? 'T2' : 'T1';
+  btn.textContent = next;
+  await window.pywebview.api.set_auto_bait(next);
+});
+
+document.getElementById('auto-rods-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('auto-rods-btn');
+  const current = btn.textContent;
+  const next = current === 'T1' ? 'T2' : 'T1';
+  btn.textContent = next;
+  await window.pywebview.api.set_auto_rod(next);
+});
+
+// === INITIALIZE ===
+window.addEventListener('pywebviewready', async () => {
+  await loadDaily();
+  await loadSummary();
+  await updateButtonValues();
+
+  const res = await window.pywebview.api.get_resolution();
+  document.getElementById('resolution').value = res;
+  document.getElementById('res-pill').textContent = res;
+});
+
+
+// === INITIALIZE ===
+window.addEventListener('pywebviewready', async () => {
+  await loadDaily();
+  await loadSummary();
+  await updateButtonValues();
+
+  const res = await window.pywebview.api.get_resolution();
+  document.getElementById('resolution').value = res;
+  document.getElementById('res-pill').textContent = res;
+});
+
+// === DEFAULT PAGE ===
+showPage('daily');
+</script>
+
+</body>
 </html>
