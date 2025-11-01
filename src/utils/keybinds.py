@@ -108,6 +108,11 @@ def get_key(name: str):
     return config.get(name, DEFAULT_KEYS.get(name))
 
 
+def get_pykey(name: str):
+    """Get any key from config by name as a string."""
+    config = load_config()
+    return resolve_key(config.get(name, DEFAULT_KEYS.get(name)))
+
 
 def set_key(name: str, key_value):
     """Save any key (pynput or str) to config."""

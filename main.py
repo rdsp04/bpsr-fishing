@@ -35,7 +35,7 @@ CHECK_INTERVAL = 0.05
 THRESHOLD = 0.7
 SPAM_CPS = 20
 session_stats = {"catches": 0, "misses": 0, "xp": 0, "rate": 0.0}
-from src.utils.keybinds import get_keys,key_to_str
+from src.utils.keybinds import get_keys,key_to_str, get_pykey
 from src.utils.path import get_data_dir
 
 START_KEY, STOP_KEY = get_keys()
@@ -491,7 +491,7 @@ def main():
                 last_progress_time = time.time()
 
                 log_broken_rod()
-                press_key("m")
+                press_key(get_pykey("rods_key"))
                 time.sleep(0.2)
                 use_rod = image_service.find_image_in_window(
                     rect,
@@ -592,10 +592,10 @@ def handle_no_progress_loop(window_title):
         # Perform recovery actions
         print("No progress detected, performing recovery actions...")
         if esc_key:
-            press_key(esc_key)
+            press_key(get_pykey("esc_key"))
             time.sleep(1)
         if fish_key:
-            press_key(fish_key)
+            press_key(get_pykey("fish_key"))
             time.sleep(1)
 
         last_progress_time = time.time()
