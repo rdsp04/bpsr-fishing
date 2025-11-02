@@ -500,32 +500,32 @@
 
                 <div class="field">
                     <label>Start Key</label>
-                    <button id="start-key-btn" class="key-btn">F9</button>
+                    <button id="start_key-btn" class="key-btn">F9</button>
                 </div>
 
                 <div class="field">
                     <label>Stop Key</label>
-                    <button id="stop-key-btn" class="key-btn">F10</button>
+                    <button id="stop_key-btn" class="key-btn">F10</button>
                 </div>
 
                 <div class="field">
                     <label>Fish Key</label>
-                    <button id="fish-key-btn" class="key-btn">F</button>
+                    <button id="fish_key-btn" class="key-btn">F</button>
                 </div>
 
                 <div class="field">
                     <label>Bait Key</label>
-                    <button id="bait-key-btn" class="key-btn">N</button>
+                    <button id="bait_key-btn" class="key-btn">N</button>
                 </div>
 
                 <div class="field">
                     <label>Rods Key</label>
-                    <button id="rods-key-btn" class="key-btn">M</button>
+                    <button id="rods_key-btn" class="key-btn">M</button>
                 </div>
 
                 <div class="field">
                     <label>Escape Key</label>
-                    <button id="esc-key-btn" class="key-btn">ESC</button>
+                    <button id="esc_key-btn" class="key-btn">ESC</button>
                 </div>
 
             </div>
@@ -628,67 +628,48 @@ document.getElementById('resolution').onchange = async (e) => {
 };
 
 // === BUTTON-BASED KEYBIND HANDLING ===
-const keyButtons = {
-  "start-key": "start-key-btn",
-  "stop-key": "stop-key-btn",
-  "fish-key": "fish-key-btn",
-  "bait-key": "bait-key-btn",
-  "rods-key": "rods-key-btn",
-  "esc-key": "esc-key-btn",
-};
 
-async function updateButtonValues() {
-  for (const [key, btnId] of Object.entries(keyButtons)) {
-    const btn = document.getElementById(btnId);
-    try {
-      const val = await window.pywebview.api[`get_${key.replace('-', '_')}`]();
-      if (val) btn.textContent = val.toUpperCase();
-    } catch (e) { console.warn('Failed to get key', key); }
-  }
 
-  try {
-    const bait = await window.pywebview.api.get_auto_bait();
-    const rods = await window.pywebview.api.get_auto_rod();
-    document.getElementById('auto-bait-btn').textContent = bait;
-    document.getElementById('auto-rods-btn').textContent = rods;
-  } catch (e) {}
+const keyButtons = [
+    "start_key",
+    "stop_key",
+    "fish_key",
+    "bait_key",
+    "rods_key",
+    "esc_key"
+];
+
+async function initKeyButtons() {
+    for (let keyName of keyButtons) {
+        const btn = document.getElementById(`${keyName}-btn`);
+        if (!btn) continue;
+
+        // Load initial key from Python
+        try {
+            const val = await window.pywebview.api.get_key(keyName);
+            btn.textContent = val || "Unset";
+        } catch(err) {
+            console.error(`Failed to get key: ${keyName}`, err);
+            btn.textContent = "Unset"; // fallback
+        }
+
+        btn.onclick = async () => {
+            btn.style.background = 'rgba(0,180,255,0.25)';
+            btn.style.borderColor = 'rgba(0,180,255,0.5)';
+            btn.blur();
+            try {
+                const key = await window.pywebview.api.capture_key_for(keyName);
+                btn.textContent = key; // update to new key
+            } catch(err) {
+                console.error(`Failed to capture key: ${keyName}`, err);
+            } finally {
+                btn.style.background = '';
+                btn.style.borderColor = '';
+            }
+        };
+    }
 }
 
-// === CLICK TO CHANGE KEY ===
-Object.entries(keyButtons).forEach(([key, btnId]) => {
-  const btn = document.getElementById(btnId);
-  btn.addEventListener('click', () => {
-    btn.textContent = '...';
-    btn.style.background = 'rgba(0,180,255,0.25)';
-    btn.style.borderColor = 'rgba(0,180,255,0.5)';
-    btn.blur();
-
-    const keyHandler = async (e) => {
-      e.preventDefault();
-      document.removeEventListener('keydown', keyHandler);
-
-      if (e.key === 'Escape') {
-        // cancel remap
-        await updateButtonValues();
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        return;
-      }
-
-      const pressed = e.key.length === 1 ? e.key.toUpperCase() : e.key.toUpperCase();
-      btn.textContent = pressed;
-      btn.style.background = '';
-      btn.style.borderColor = '';
-      try {
-        await window.pywebview.api[`set_${key.replace('-', '_')}`](pressed);
-      } catch (err) {
-        console.error('Failed to set key', key, err);
-      }
-    };
-
-    document.addEventListener('keydown', keyHandler);
-  });
-});
 
 // === BUTTONS FOR AUTO BUY ===
 document.getElementById('auto-bait-btn').addEventListener('click', async () => {
@@ -711,24 +692,13 @@ document.getElementById('auto-rods-btn').addEventListener('click', async () => {
 window.addEventListener('pywebviewready', async () => {
   await loadDaily();
   await loadSummary();
-  await updateButtonValues();
+  await initKeyButtons();
 
   const res = await window.pywebview.api.get_resolution();
   document.getElementById('resolution').value = res;
   document.getElementById('res-pill').textContent = res;
 });
 
-
-// === INITIALIZE ===
-window.addEventListener('pywebviewready', async () => {
-  await loadDaily();
-  await loadSummary();
-  await updateButtonValues();
-
-  const res = await window.pywebview.api.get_resolution();
-  document.getElementById('resolution').value = res;
-  document.getElementById('res-pill').textContent = res;
-});
 
 // === DEFAULT PAGE ===
 showPage('daily');
