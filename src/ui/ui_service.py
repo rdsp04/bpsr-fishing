@@ -67,4 +67,4 @@ def start_ui():
         except Exception:
             pass
 
-    webview.start(func=maximize_main, debug=True)
+    webview.start(func=maximize_main, debug=False)
