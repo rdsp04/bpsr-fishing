@@ -138,8 +138,6 @@
     .fa-power-off { color: #d1d5db; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3)); }
     .fa-clock { color: #93c5fd; filter: drop-shadow(0 0 4px rgba(147, 197, 253, 0.8)); }
 
-  </style>
-</head>
 
 <body class="flex items-center justify-center w-screen h-screen">
 
@@ -207,51 +205,63 @@
     const closeBtn = document.getElementById('close-btn');
     const minimizeBtn = document.getElementById('minimize-btn');
 
-    let startTime = null;
-    let elapsedTime = 0;
-    let timerInterval = null;
-    let botRunning = false;
+        let startTime = null;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let botRunning = false;
 
-    window.toggleBotStatus = (state) => setStatus(state);
+        window.toggleBotStatus = function (state) {
+            setStatus(state);
+        };
 
-    window.updateStats = (data) => {
-      if (data.catches !== undefined) document.getElementById('stat-catches').textContent = data.catches;
-      if (data.misses !== undefined) document.getElementById('stat-misses').textContent = data.misses;
-      if (data.xp !== undefined) document.getElementById('stat-xp').textContent = data.xp;
-      if (data.rate !== undefined) document.getElementById('stat-rate').textContent = data.rate + '%';
-    };
 
-    function setStatus(state) {
-      botRunning = state === 'running';
-      if (botRunning) {
-        indicator.className = 'status-dot w-4 h-4 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] mb-1';
-        statusText.textContent = 'Running';
-        statusText.className = 'text-green-300';
-        startTime = new Date() - elapsedTime;
-        if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
-      } else {
-        indicator.className = 'status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1';
-        statusText.textContent = 'Stopped';
-        statusText.className = 'text-red-300';
-        clearInterval(timerInterval);
-        timerInterval = null;
-        elapsedTime = new Date() - startTime;
-      }
-    }
+        window.updateStats = function (data) {
+            if (data.catches !== undefined) document.getElementById('stat-catches').textContent = data.catches;
+            if (data.misses !== undefined) document.getElementById('stat-misses').textContent = data.misses;
+            if (data.xp !== undefined) document.getElementById('stat-xp').textContent = data.xp;
+            if (data.rate !== undefined) document.getElementById('stat-rate').textContent = data.rate + '%';
+        };
 
-    function updateTimer() {
-      const diff = new Date() - startTime;
-      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
-      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      timer.textContent = `${h}:${m}:${s}`;
-    }
+        function setStatus(state) {
+            botRunning = state === 'running';
 
-    document.getElementById('start-btn').addEventListener('click', () => setStatus('running'));
-    document.getElementById('stop-btn').addEventListener('click', () => setStatus('stopped'));
+            if (botRunning) {
+                indicator.className = 'status-dot w-4 h-4 rounded-full bg-green-500 shadow-[0_0_6px_#22c55e] mb-1';
+                statusText.textContent = 'Running';
+                statusText.className = 'text-green-300';
 
-    minimizeBtn.addEventListener('click', () => window.pywebview?.api.minimize_window());
-    closeBtn.addEventListener('click', () => window.pywebview?.api.close_window());
-  </script>
+                startTime = new Date() - elapsedTime;
+                if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
+            } else {
+                indicator.className = 'status-dot w-4 h-4 rounded-full bg-red-500 shadow-[0_0_6px_#ff3b3b] mb-1';
+                statusText.textContent = 'Stopped';
+                statusText.className = 'text-red-300';
+
+                clearInterval(timerInterval);
+                timerInterval = null;
+                elapsedTime = new Date() - startTime;
+            }
+        }
+
+
+        function updateTimer() {
+            const diff = new Date() - startTime;
+            const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+            const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+            const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+            timer.textContent = `${h}:${m}:${s}`;
+        }
+
+        document.getElementById('start-btn').addEventListener('click', () =>  window.pywebview.api.start_script());
+        document.getElementById('stop-btn').addEventListener('click', () =>  window.pywebview.api.stop_script());
+
+        minimizeBtn.addEventListener('click', () => {
+            if (window.pywebview) window.pywebview.api.minimize_window();
+        });
+
+        closeBtn.addEventListener('click', () => {
+            if (window.pywebview) window.pywebview.api.close_window();
+        });
+    </script>
 </body>
 </html>

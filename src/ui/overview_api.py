@@ -2,13 +2,11 @@ import webview
 from src.utils.keybinds import (
     get_keys,
     set_keys,
-    get_key,
-    set_key,
     resolve_key,
     key_to_str,
-    DEFAULT_START_KEY,
-    DEFAULT_STOP_KEY,
 )
+from main import handle_start_key, handle_stop_key
+
 def get_window(title):
     for w in webview.windows:
         if w.title == title:
@@ -21,13 +19,11 @@ class OverviewApi:
     def __init__(self):
         self.start_key, self.stop_key = get_keys()
 
-    def start_bot(self):
-        print("Bot started")
-        return "running"
+    def start_script(self):
+        handle_start_key()
 
-    def stop_bot(self):
-        print("Bot stopped")
-        return "stopped"
+    def stop_script(self):
+        handle_stop_key()
 
     def minimize_window(self):
         w = get_window("bpsr-fishing Overlay")

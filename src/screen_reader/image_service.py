@@ -31,7 +31,6 @@ class ImageService:
 
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-
         template = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
         if template is None:
             print(f"Template not found: {image_path}")
@@ -47,36 +46,54 @@ class ImageService:
 
         return None
 
-    def find_best_matching_fish(self, window_rect):
+    def capture_window(self, window_rect, region=None):
         """
-        Returns the fish name with the highest score and the score itself.
-        Searches only in a specific bottom-left region:
-        - 20% width of window
-        - 33% height of window
-        - top margin at 66% height
+        Take a screenshot of a window or a sub-region.
+        window_rect: full window coordinates (x1, y1, x2, y2)
+        region: optional tuple (left, top, width, height) relative to window
+        Returns a grayscale numpy array
         """
         if not window_rect:
-            return None, 0.0, None
+            return None
 
         x1, y1, x2, y2 = window_rect
         w, h = x2 - x1, y2 - y1
 
-        screenshot = self.screen_service.safe_screenshot(region=(x1, y1, w, h))
+        if region:
+            rx, ry, rw, rh = region
+            screenshot = self.screen_service.safe_screenshot(
+                region=(x1 + rx, y1 + ry, rw, rh)
+            )
+        else:
+            screenshot = self.screen_service.safe_screenshot(region=(x1, y1, w, h))
+
         if screenshot is None:
-            return None, 0.0, None
+            return None
 
         img_rgb = np.array(screenshot)
         img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        return img_gray
+
+    def find_best_matching_fish(self, window_rect, img=None):
+        """
+        Returns best matching fish type and score.
+        If img is provided, uses that instead of taking a screenshot.
+        """
+        if img is None:
+            img = self.capture_window(window_rect)
+
+        if img is None:
+            return None, 0.0
 
         # Define the crop region
+        h, w = img.shape
         crop_width = int(w * 0.30)
         crop_height = int(h * 0.33)
         crop_x1 = int(w * 0.20)
         crop_y1 = int(h * 0.66)
         crop_x2 = crop_x1 + crop_width
         crop_y2 = crop_y1 + crop_height
-
-        img_gray_crop = img_gray[crop_y1:crop_y2, crop_x1:crop_x2]
+        img_crop = img[crop_y1:crop_y2, crop_x1:crop_x2]
 
         self.resolution_folder = get_resolution_folder()
         fish_folder = self.target_images_folder / self.resolution_folder / "fish"
@@ -103,22 +120,80 @@ class ImageService:
                 template = cv2.cvtColor(template_img, cv2.COLOR_BGR2GRAY)
                 mask = None
 
-            template = template.astype(np.uint8)
-            img_crop_uint8 = img_gray_crop.astype(np.uint8)
-
             try:
                 res = cv2.matchTemplate(
-                    img_crop_uint8, template, cv2.TM_CCOEFF_NORMED, mask=mask
+                    img_crop.astype(np.uint8),
+                    template.astype(np.uint8),
+                    cv2.TM_CCOEFF_NORMED,
+                    mask=mask,
                 )
-                _, max_val, _, max_loc = cv2.minMaxLoc(res)
+                _, max_val, _, _ = cv2.minMaxLoc(res)
             except cv2.error:
                 max_val = 0.0
-                max_loc = (0, 0)
-
-            print(f"Checked {fish_name}, score: {max_val:.4f}")
 
             if max_val > best_score:
                 best_score = max_val
                 best_fish = fish_name
 
         return best_fish, best_score
+
+    def find_minigame_arrow(self, window_rect, img=None):
+        """
+        Detect arrows in minigame.
+        Uses optional pre-captured img, otherwise captures screenshot.
+        Returns best_match and score
+        """
+        if img is None:
+            img = self.capture_window(window_rect)
+
+        if img is None:
+            return None, 0.0
+
+        h, w = img.shape
+        crop_width = int(w * 0.40)
+        crop_height = int(h * 0.20)
+        crop_x1 = int(w * 0.30)
+        crop_y1 = int(h * 0.40)
+        crop_x2 = crop_x1 + crop_width
+        crop_y2 = crop_y1 + crop_height
+        img_crop = img[crop_y1:crop_y2, crop_x1:crop_x2]
+
+        self.resolution_folder = get_resolution_folder()
+        arrow_folder = self.target_images_folder / self.resolution_folder
+
+        templates = ["left-high.png", "right-high.png"]
+        best_match = None
+        best_score = 0.0
+
+        for template_name in templates:
+            template_path = arrow_folder / template_name
+            if not template_path.exists():
+                continue
+
+            template_img = cv2.imread(str(template_path), cv2.IMREAD_UNCHANGED)
+            if template_img is None:
+                continue
+
+            if template_img.shape[2] == 4:
+                template = cv2.cvtColor(template_img[:, :, :3], cv2.COLOR_BGR2GRAY)
+                mask = (template_img[:, :, 3] > 0).astype(np.uint8) * 255
+            else:
+                template = cv2.cvtColor(template_img, cv2.COLOR_BGR2GRAY)
+                mask = None
+
+            try:
+                res = cv2.matchTemplate(
+                    img_crop.astype(np.uint8),
+                    template.astype(np.uint8),
+                    cv2.TM_CCOEFF_NORMED,
+                    mask=mask,
+                )
+                _, max_val, _, _ = cv2.minMaxLoc(res)
+            except cv2.error:
+                max_val = 0.0
+
+            if max_val > best_score:
+                best_score = max_val
+                best_match = template_name.replace(".png", "")
+
+        return best_match, best_score

@@ -3,10 +3,8 @@ import os
 import sys
 import json
 from datetime import datetime
-import win32gui
 from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode, Key
-import pyautogui
 
 from src.utils.updater import check_for_update, download_update, run_update, UpdateApi
 
@@ -146,6 +144,10 @@ def on_press(key):
 
 
 # ---------------- Window Handling ----------------
+
+import win32gui
+
+
 def focus_blue_protocol_window():
     target_title = "Blue Protocol: Star Resonance"
     hwnd = win32gui.FindWindow(None, target_title)
@@ -177,7 +179,6 @@ def get_window_rect(title):
         return None
     return win32gui.GetWindowRect(hwnd)
 
-
 # ---------------- Actions ----------------
 def click(x, y):
     time.sleep(0.05)
@@ -186,6 +187,7 @@ def click(x, y):
 
 
 def press_key(key):
+    select_window()
     time.sleep(0.05)
     keyboard.press(key)
     keyboard.release(key)
@@ -223,28 +225,9 @@ def post_catch_loop(window_title):
 
         rect = get_window_rect(window_title)
 
-        right_found = image_service.find_image_in_window(
-            rect,
-            (
-                get_data_dir()
-                / TARGET_IMAGES_FOLDER
-                / get_resolution_folder()
-                / "right.png"
-            ),
-            0.8,
-        )
-        left_found = image_service.find_image_in_window(
-            rect,
-            (
-                get_data_dir()
-                / TARGET_IMAGES_FOLDER
-                / get_resolution_folder()
-                / "left.png"
-            ),
-            0.8,
-        )
+        arrow, score = image_service.find_minigame_arrow(rect)
 
-        if right_found:
+        if arrow is not None and "right" in arrow and score > 0.8:
             last_progress_time = time.time()
 
             lane += 1
@@ -252,7 +235,7 @@ def post_catch_loop(window_title):
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
             time.sleep(0.2)
-        elif left_found:
+        elif arrow is not None and "left" in arrow and score > 0.8:
             last_progress_time = time.time()
 
             lane -= 1
@@ -325,47 +308,21 @@ def post_catch_loop(window_title):
                     / "fish"
                 )
                 fish_type = None
-                screenshot_folder = BASE / "screenshots"
-                screenshot_folder.mkdir(parents=True, exist_ok=True)
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
                 if os.path.exists(fish_folder):
-                    found = False
-                    for fname in os.listdir(fish_folder):
-                        if not fname.lower().endswith(".png"):
-                            continue
+                    attempts = 3
+                    fish_type = None
+                    for i in range(attempts):
                         fish_type, score = image_service.find_best_matching_fish(rect)
-                        if fish_type and score >= 0.8:
-                            print(
-                                f"Detected fish type: {fish_type} (score: {score:.3f})."
-                            )
-                            # screenshot_path = (
-                            #    screenshot_folder / f"screenshot_{timestamp}_{fish_type}_({score:.3f}).png"
-                            # )
-                            # pyautogui.screenshot(screenshot_path)
-                            found = True
+                        if fish_type and score >= 0.7:
+                            print(f"Detected fish type: {fish_type} (score: {score:.3f}).")
                             break
                         else:
-                            screenshot_path = (
-                                screenshot_folder / f"screenshot_{timestamp}.png"
-                            )
-                            pyautogui.screenshot(screenshot_path)
-                            print(
-                                f"No fish detected. Screenshot saved: {screenshot_path}"
-                            )
-
-                    if not found:
-                        screenshot_path = (
-                            screenshot_folder / f"screenshot_{timestamp}.png"
-                        )
-
-                        pyautogui.screenshot(screenshot_path)
-                        print(f"No fish detected. Screenshot saved: {screenshot_path}")
+                            print(f"Attempt {i + 1}: No fish type detected.")
+                            if i < attempts - 1:
+                                time.sleep(0.2)
                 else:
-                    print("Fish folder not found, taking default screenshot")
-                    screenshot_path = screenshot_folder / f"screenshot_{timestamp}.png"
-
-                    pyautogui.screenshot(screenshot_path)
+                    print("Fish folder not found.")
 
                 # Logging
                 log_args = {"status": True}
