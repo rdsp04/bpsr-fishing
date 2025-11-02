@@ -38,9 +38,10 @@ def load_config():
     """Load JSON config safely."""
     try:
         with open(CONFIG_FILE, "r") as f:
-            return json.load(f)
+            user_settings = json.load(f)
+            return {**DEFAULT_KEYS, **user_settings}
     except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        return DEFAULT_KEYS.copy()
 
 
 def save_config(config):
