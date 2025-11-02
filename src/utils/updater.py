@@ -7,7 +7,7 @@ import requests
 import webview
 import ctypes
 
-APP_VERSION = "v1.2.0"
+APP_VERSION = "v1.2.1"
 LATEST_URL = "https://raw.githubusercontent.com/rdsp04/bpsr-fishing/main/latest.json"
 
 
