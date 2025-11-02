@@ -1,7 +1,6 @@
 import webview
 from enum import Enum
 
-
 windows = {}
 
 class Window(Enum):
@@ -10,7 +9,6 @@ class Window(Enum):
 
 
 def get_window(window_type: Window):
- 
     return windows.get(window_type.value)
 
 
@@ -25,34 +23,33 @@ def start_ui():
     api = StatsApi()
     overview_api = OverviewApi()
 
-  
     with open(HTML_PATH / "overlay.html", "r", encoding="utf-8") as f:
         overlay_html = f.read()
     with open(HTML_PATH / "main.html", "r", encoding="utf-8") as f:
         main_html = f.read()
 
-
+    # Hlavní okno
     main_window = webview.create_window(
         "bpsr-fishing Stats",
         html=main_html,
         js_api=api,
-        width=1200,
-        height=700,
+        width=1920,
+        height=1080,
         min_size=(400, 300),
         resizable=True,
         frameless=False,
         transparent=False,
-        minimized=True,
+        minimized=False,
     )
     windows[Window.MAIN.value] = main_window
 
-
+    # Overlay okno
     overlay_window = webview.create_window(
         "bpsr-fishing Overlay",
         html=overlay_html,
         js_api=overview_api,
         frameless=True,
-        transparent=False,  
+        transparent=False,
         easy_drag=True,
         width=310,
         height=170,
@@ -61,5 +58,15 @@ def start_ui():
     )
     windows[Window.OVERLAY.value] = overlay_window
 
-    
-    webview.start()
+    def maximize_main():
+        try:
+            main_window.destroy_fullscreen() 
+        except Exception:
+            pass
+
+        try:
+            main_window.maximize() 
+        except Exception:
+            pass
+
+    webview.start(func=maximize_main, debug=False)

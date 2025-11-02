@@ -3,9 +3,18 @@ from datetime import datetime
 from collections import defaultdict
 from tabulate import tabulate
 from pathlib import Path
+from statistics import mean
+
 from src.fish.fish_service import FishService
 from src.utils.path import get_data_dir
-from src.utils.keybinds import resolve_key, key_to_str, set_key, get_key, DEFAULT_KEYS, capture_and_set_key
+from src.utils.keybinds import (
+    resolve_key,
+    key_to_str,
+    set_key,
+    get_key,
+    DEFAULT_KEYS,
+    capture_and_set_key,
+)
 
 
 BASE = get_data_dir()
@@ -17,8 +26,9 @@ DEFAULT_SETTINGS = {
     "resolution": "1920x1080",
     "auto_bait_purchase": "T1",
     "auto_rods_purchase": "T1",
-    **DEFAULT_KEYS
+    **DEFAULT_KEYS,
 }
+
 SETTINGS_FILE = BASE / "config/settings.json"
 
 
@@ -27,13 +37,17 @@ class FishStats:
         self.fish_logs = self.load_json(FISH_FILE)
         self.broken_logs = self.load_json(BROKEN_FILE)
         self.fish_xp = self.get_fish_xp_map()
-        self.fish_summary, self.fish_types = self.summarize_fishing(self.fish_logs, self.fish_xp)
+        self.fish_summary, self.fish_types = self.summarize_fishing(
+            self.fish_logs, self.fish_xp
+        )
         self.broken_summary = self.summarize_broken_rods(self.broken_logs)
 
     def refresh(self):
         self.fish_logs = self.load_json(FISH_FILE)
         self.broken_logs = self.load_json(BROKEN_FILE)
-        self.fish_summary, self.fish_types = self.summarize_fishing(self.fish_logs, self.fish_xp)
+        self.fish_summary, self.fish_types = self.summarize_fishing(
+            self.fish_logs, self.fish_xp
+        )
         self.broken_summary = self.summarize_broken_rods(self.broken_logs)
 
     def load_json(self, filename):
@@ -51,20 +65,30 @@ class FishStats:
     def summarize_fishing(self, logs, fish_xp):
         summary = defaultdict(
             lambda: defaultdict(
-                lambda: {"catch": 0, "fail": 0, "xp": 0, "times": [], "fish_types": defaultdict(int)}
+                lambda: {
+                    "catch": 0,
+                    "fail": 0,
+                    "xp": 0,
+                    "times": [],
+                    "fish_types": defaultdict(int),
+                }
             )
         )
         all_fish_types = set()
+
         for entry in logs:
             ts = entry.get("timestamp")
             status = entry.get("catch")
             fish_type = entry.get("fish_type")
             if ts is None or status is None:
                 continue
+
             dt = datetime.fromisoformat(ts)
             date_str = dt.date().isoformat()
             hour_str = f"{dt.hour:02d}:00"
+
             summary[date_str][hour_str]["times"].append(dt)
+
             if status:
                 summary[date_str][hour_str]["catch"] += 1
                 if not fish_type or fish_type not in fish_xp:
@@ -72,11 +96,13 @@ class FishStats:
                     xp_value = 1
                 else:
                     xp_value = fish_xp[fish_type]
+
                 summary[date_str][hour_str]["fish_types"][fish_type] += 1
                 summary[date_str][hour_str]["xp"] += xp_value
                 all_fish_types.add(fish_type)
             else:
                 summary[date_str][hour_str]["fail"] += 1
+
         return summary, sorted(all_fish_types)
 
     def summarize_broken_rods(self, logs):
@@ -86,10 +112,12 @@ class FishStats:
             broken = entry.get("broken")
             if not ts or not broken:
                 continue
+
             dt = datetime.fromisoformat(ts)
             date_str = dt.date().isoformat()
             hour_str = f"{dt.hour:02d}:00"
             summary[date_str][hour_str] += 1
+
         return summary
 
     def calculate_fish_per_minute(self, times):
@@ -102,39 +130,92 @@ class FishStats:
         if date not in self.fish_summary:
             return f"<p>No data for {date}</p>"
 
-        rows = []
         hours = self.fish_summary[date]
         broken = self.broken_summary.get(date, {})
 
-        for hour, counts in sorted(hours.items()):
-            total = counts["catch"] + counts["fail"]
-            rate = (counts["catch"] / total * 100) if total else 0
-            fpm = self.calculate_fish_per_minute(counts["times"])
-            type_counts = [counts["fish_types"].get(ft, 0) for ft in self.fish_types]
-            rows.append([
-                hour,
-                counts["catch"],
-                counts["fail"],
-                broken.get(hour, 0),
-                f"{rate:.2f}%",
-                f"{fpm:.2f}",
-                counts["xp"],
-                *type_counts,
-            ])
+        total_caught = sum(h["catch"] for h in hours.values())
+        total_missed = sum(h["fail"] for h in hours.values())
+        total_xp = sum(h["xp"] for h in hours.values())
+        total_hours = len(hours)
+        avg_xp_hour = total_xp / total_hours if total_hours else 0
 
-        headers = [
-            "Hour", "Caught", "Missed", "Broken Rods", "Catch Rate", "Fish/Min", "XP/Hour"
-        ] + self.fish_types
-        return tabulate(rows, headers=headers, tablefmt="html")
+        total_all = total_caught + total_missed
+        catch_rate = (total_caught / total_all * 100) if total_all else 0
+
+        fish_counts = {ft: 0 for ft in self.fish_types}
+        for h in hours.values():
+            for ft, cnt in h["fish_types"].items():
+                fish_counts[ft] += cnt
+
+        filtered_fish = {k: v for k, v in fish_counts.items() if v > 0}
+        sorted_fish = sorted(filtered_fish.items(), key=lambda x: x[1], reverse=True)
+
+        total_fish_time = 0
+        try:
+            with open("logs/sessions.json", "r", encoding="utf-8") as f:
+                sessions = json.load(f)
+
+            for sess in sessions:
+                start_str = sess.get("start")
+                stop_str = sess.get("stop")
+                if not start_str or not stop_str:
+                    continue
+
+                try:
+                    start_dt = datetime.fromisoformat(start_str)
+                    stop_dt = datetime.fromisoformat(stop_str)
+                except Exception:
+                    continue
+
+                if start_dt.date().isoformat() == date:
+                    delta = stop_dt - start_dt
+                    total_fish_time += delta.total_seconds() / 60  # v minutách
+
+        except Exception as e:
+            print("⚠️ Nepodařilo se načíst sessions:", e)
+
+        hours_part = int(total_fish_time // 60)
+        minutes_part = int(total_fish_time % 60)
+        formatted_time = f"{hours_part}h {minutes_part}m" if total_fish_time else "0h 0m"
+
+        summary_html = f"""
+        <div class="daily-summary">
+            <div class="daily-metric"><span class="label">Caught</span><span class="value">{total_caught}</span></div>
+            <div class="daily-metric"><span class="label">Missed</span><span class="value">{total_missed}</span></div>
+            <div class="daily-metric"><span class="label">XP/hour</span><span class="value">{avg_xp_hour:.0f}</span></div>
+            <div class="daily-metric"><span class="label">Catch Rate</span><span class="value">{catch_rate:.2f}%</span></div>
+            <div class="daily-metric"><span class="label">Total Hours</span><span class="value">{formatted_time}</span></div>
+        </div>
+        """
+
+        max_fish = max(filtered_fish.values()) if filtered_fish else 1
+        bars_html = ""
+        for fish, count in sorted_fish:
+            width = (count / max_fish * 100) if max_fish > 0 else 0
+            display_name = fish.replace("_", " ").title()
+            bars_html += f"""
+            <div class="fish-row">
+                <span class="fish-name">{display_name}</span>
+                <div class="fish-bar">
+                    <div class="fish-fill" style="width:{width:.1f}%;"></div>
+                </div>
+                <span class="fish-count">{count}</span>
+            </div>
+            """
+
+        return f"""
+        <div class="daily-box">
+            <h3 class="daily-date">{date}</h3>
+            {summary_html}
+            <div class="fish-graph">{bars_html}</div>
+        </div>
+        """
+
 
     def get_all_daily_tables(self):
         html = ""
         for date in sorted(self.fish_summary.keys()):
-            daily_table = self.get_daily_table(date)
-            html += f'<div class="mb-6">'
-            html += f'<h2 class="text-lg font-semibold mb-2">{date}</h2>'
-            html += f'<div class="overflow-x-auto bg-gray-800 rounded p-2">{daily_table}</div>'
-            html += "</div>"
+            html += self.get_daily_table(date)
         return html
 
     def get_overall_summary(self):
@@ -155,7 +236,7 @@ class FishStats:
         overall_rate = (total_caught / total_fish * 100) if total_fish else 0
         avg_fpm = (total_caught / 60) if total_fish else 0
 
-        html = '''
+        html = """
         <div class="summary-table">
           <table class="data-table">
             <thead>
@@ -180,18 +261,20 @@ class FishStats:
             </tbody>
           </table>
         </div>
-        '''.format(
+        """.format(
             total_caught=total_caught,
             total_failed=total_failed,
             total_broken=total_broken,
             overall_rate=overall_rate,
             avg_fpm=avg_fpm,
-            total_xp=total_xp
+            total_xp=total_xp,
         )
 
         max_count = max(total_fish_types.values()) if total_fish_types else 1
         fish_type_bars = ""
-        for ft, count in sorted(total_fish_types.items(), key=lambda x: x[1], reverse=True):
+        for ft, count in sorted(
+            total_fish_types.items(), key=lambda x: x[1], reverse=True
+        ):
             width_percent = (count / max_count) * 100
             fish_type_bars += f"""
                 <div style='display: flex; align-items: center; margin-bottom: 6px;'>
@@ -217,19 +300,21 @@ class FishStats:
     def get_fish_types_html(self):
         self.refresh()
         total_fish_types = defaultdict(int)
+
         for date, hours in self.fish_summary.items():
             for hour, counts in hours.items():
                 for ft, c in counts["fish_types"].items():
                     total_fish_types[ft] += c
+
         html = '<div class="fish-type-summary">'
         for ft, count in sorted(total_fish_types.items(), key=lambda x: x[0]):
-            html += f'''
+            html += f"""
                 <div class="fish-entry flex justify-between">
                     <span class="fish-name">{ft}</span>
                     <span class="fish-count">{count}</span>
                 </div>
-            '''
-        html += '</div>'
+            """
+        html += "</div>"
         return html
 
 
@@ -270,14 +355,18 @@ class StatsApi:
         self._save_settings()
 
     def get_auto_bait(self) -> str:
-        return self._settings.get("auto_bait_purchase", DEFAULT_SETTINGS["auto_bait_purchase"])
+        return self._settings.get(
+            "auto_bait_purchase", DEFAULT_SETTINGS["auto_bait_purchase"]
+        )
 
     def set_auto_rod(self, rod: str):
         self._settings["auto_rods_purchase"] = rod
         self._save_settings()
 
     def get_auto_rod(self) -> str:
-        return self._settings.get("auto_rods_purchase", DEFAULT_SETTINGS["auto_rods_purchase"])
+        return self._settings.get(
+            "auto_rods_purchase", DEFAULT_SETTINGS["auto_rods_purchase"]
+        )
 
     def _set_key(self, name: str, key_str: str):
         resolved = resolve_key(key_str)
@@ -294,12 +383,12 @@ class StatsApi:
             raise ValueError(f"Invalid key name: {name}")
         return get_key(name)
 
-
     def capture_key_for(self, name: str):
         if name not in DEFAULT_KEYS:
             raise ValueError(f"Invalid key name: {name}")
         key_str = capture_and_set_key(name)
         return key_str
+
     # --- Stats functions ---
     def get_daily_table(self):
         return self.stats.get_all_daily_tables()
