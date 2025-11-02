@@ -181,8 +181,15 @@ Section "Install"
   ${If} $isUpdate == "1"
     DetailPrint "Updating ${AppName}..."
     ; Delete only files that need replacement
+    RMDir /r "$INSTDIR\images"
+    RMDir /r "$INSTDIR\html"
+    RMDir /r "$INSTDIR\icons"
+    RMDir /r "$INSTDIR\.git"
+    RMDir /r "$INSTDIR\.venv"
+
+    RMDir /r "$INSTDIR\config"
     Delete "$INSTDIR\${AppExecutable}"
-    Delete "$INSTDIR\config\*.*"
+
     ; Keep logs/screenshots
   ${Else}
     DetailPrint "Installing ${AppName}..."
