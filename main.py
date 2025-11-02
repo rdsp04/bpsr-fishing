@@ -310,25 +310,17 @@ def post_catch_loop(window_title):
                 fish_type = None
 
                 if os.path.exists(fish_folder):
-                    found = False
-                    for fname in os.listdir(fish_folder):
-                        if not fname.lower().endswith(".png"):
-                            continue
+                    attempts = 3
+                    fish_type = None
+                    for i in range(attempts):
                         fish_type, score = image_service.find_best_matching_fish(rect)
-                        if fish_type and score >= 0.8:
-                            print(
-                                f"Detected fish type: {fish_type} (score: {score:.3f})."
-                            )
-
-                            found = True
+                        if fish_type and score >= 0.7:
+                            print(f"Detected fish type: {fish_type} (score: {score:.3f}).")
                             break
                         else:
-                            print(
-                                f"No fish type detected."
-                            )
-
-                    if not found:
-                        print(f"No fish detected. ")
+                            print(f"Attempt {i + 1}: No fish type detected.")
+                            if i < attempts - 1:
+                                time.sleep(0.2)
                 else:
                     print("Fish folder not found.")
 
