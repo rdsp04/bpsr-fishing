@@ -56,15 +56,6 @@ def start_ui():
     )
     windows[Window.OVERLAY.value] = overlay_window
 
-    def maximize_main():
-        try:
-            main_window.destroy_fullscreen()
-        except Exception:
-            pass
 
-        try:
-            main_window.maximize()
-        except Exception:
-            pass
 
-    webview.start(func=maximize_main, debug=False)
+    webview.start(debug=False)
