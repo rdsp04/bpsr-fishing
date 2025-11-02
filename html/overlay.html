@@ -124,8 +124,6 @@
     </style>
 </head>
 
-  </style>
-</head>
 
 <body class="flex items-center justify-center w-screen h-screen">
   <div class="overlay">
@@ -232,8 +230,8 @@
             timer.textContent = `${h}:${m}:${s}`;
         }
 
-        document.getElementById('start-btn').addEventListener('click', () => setStatus('running'));
-        document.getElementById('stop-btn').addEventListener('click', () => setStatus('stopped'));
+        document.getElementById('start-btn').addEventListener('click', () =>  window.pywebview.api.start_script());
+        document.getElementById('stop-btn').addEventListener('click', () =>  window.pywebview.api.stop_script());
 
         minimizeBtn.addEventListener('click', () => {
             if (window.pywebview) window.pywebview.api.minimize_window();
@@ -243,7 +241,5 @@
             if (window.pywebview) window.pywebview.api.close_window();
         });
     </script>
-</body>
-  </script>
 </body>
 </html>
