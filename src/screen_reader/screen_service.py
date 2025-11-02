@@ -15,7 +15,6 @@ class ScreenService:
     def safe_screenshot(self, region=None, retries=5, delay=2):
         """Take a screenshot safely. Retries if it fails."""
 
-        print(region)
         for i in range(retries):
             try:
                 return self._capture(region or self.region)
