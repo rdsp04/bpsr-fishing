@@ -28,14 +28,13 @@ def start_ui():
     with open(HTML_PATH / "main.html", "r", encoding="utf-8") as f:
         main_html = f.read()
 
-    # Hlavní okno
     main_window = webview.create_window(
         "bpsr-fishing Stats",
         html=main_html,
         js_api=api,
-        width=1920,
-        height=1080,
-        min_size=(400, 300),
+        width=940,
+        height=600,
+        min_size=(900, 600),
         resizable=True,
         frameless=False,
         transparent=False,
@@ -43,7 +42,6 @@ def start_ui():
     )
     windows[Window.MAIN.value] = main_window
 
-    # Overlay okno
     overlay_window = webview.create_window(
         "bpsr-fishing Overlay",
         html=overlay_html,
@@ -60,13 +58,13 @@ def start_ui():
 
     def maximize_main():
         try:
-            main_window.destroy_fullscreen() 
+            main_window.destroy_fullscreen()
         except Exception:
             pass
 
         try:
-            main_window.maximize() 
+            main_window.maximize()
         except Exception:
             pass
 
-    webview.start(func=maximize_main, debug=False)
+    webview.start(func=maximize_main, debug=True)

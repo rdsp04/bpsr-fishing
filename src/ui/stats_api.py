@@ -169,10 +169,10 @@ class FishStats:
 
                 if start_dt.date().isoformat() == date:
                     delta = stop_dt - start_dt
-                    total_fish_time += delta.total_seconds() / 60  # v minutách
+                    total_fish_time += delta.total_seconds() / 60
 
         except Exception as e:
-            print("⚠️ Nepodařilo se načíst sessions:", e)
+            print("Error loading sessions sessions:", e)
 
         hours_part = int(total_fish_time // 60)
         minutes_part = int(total_fish_time % 60)
