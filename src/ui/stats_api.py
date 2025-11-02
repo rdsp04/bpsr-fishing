@@ -1,9 +1,9 @@
 import json
 from datetime import datetime
 from collections import defaultdict
-from tabulate import tabulate
-from pathlib import Path
-from statistics import mean
+import requests
+import markdown
+import re
 
 from src.fish.fish_service import FishService
 from src.utils.path import get_data_dir
@@ -328,6 +328,42 @@ class StatsApi:
         self.bait_key = get_key("bait_key")
         self.rods_key = get_key("rods_key")
         self.esc_key = get_key("esc_key")
+        self.readme_url = "https://raw.githubusercontent.com/rdsp04/bpsr-fishing/main/GUIDE.md"
+
+    def get_guide(self):
+        try:
+            response = requests.get(self.readme_url, timeout=10)
+            response.raise_for_status()
+            md_content = response.text
+
+            # Split markdown into sections at level 2 headers (##)
+            sections = re.split(r'(?=^## )', md_content, flags=re.MULTILINE)
+
+            section_html = []
+            for section in sections:
+                if not section.strip():
+                    continue
+
+                html_section = markdown.markdown(section, extensions=["fenced_code", "tables"])
+                html_section = re.sub(r'^<h2>(.*?)</h2>', r'<h2>\1</h2>', html_section)
+                section_html.append(f'<section class="intro-section">{html_section}</section>')
+
+            # Wrap everything in the original layout structure
+            full_html = f"""
+            <div id="page-intro" class="page" style="display: block">
+            <div class="page-container">
+                <h1 class="page-title">Welcome to <span class="accent">BPSR Fishing</span></h1>
+                <p class="page-subtitle">A quick start guide and reference for new users</p>
+                <div class="content-card intro-card">
+                {''.join(section_html)}
+                </div>
+            </div>
+            </div>
+            """
+            return full_html.strip()
+
+        except requests.RequestException as e:
+            return f"<p>Failed to load guide: {e}</p>"
 
     def _load_settings(self):
         if SETTINGS_FILE.exists():
