@@ -1,11 +1,18 @@
 # BPSR Fishing Macro
 
+
+[![GitHub](https://img.shields.io/github/downloads/rdsp04/bpsr-fishing/total?style=for-the-badge&color=%23ff9800)](https://github.com/rdsp04/bpsr-fishing/releases/latest)
+
+[![GitHub](https://img.shields.io/github/v/release/rdsp04/bpsr-fishing?style=flat)](https://github.com/rdsp04/bpsr-fishing/releases)
+[![GitHub](https://img.shields.io/github/license/rdsp04/bpsr-fishing?style=flat)](https://github.com/rdsp04/bpsr-fishing/blob/master/LICENSE)
+
 A fishing automation script for Blue Protocol: Star Resonance.
 
 ## Download
 
-Download the latest executable here:
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-blue?style=for-the-badge)](https://github.com/rdsp04/bpsr-fishing/releases/latest)
+https://github.com/rdsp04/bpsr-fishing/releases/latest
+
+only available on windows
 
 ## Instructions
 
