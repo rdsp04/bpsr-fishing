@@ -31,6 +31,8 @@ DEFAULT_KEYS = {
     "bait_key": "N",
     "fish_key": "F",
     "esc_key": "ESC",
+    "left_key": "A",
+    "right_key": "D"
 }
 
 

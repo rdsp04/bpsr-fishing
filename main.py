@@ -245,14 +245,14 @@ def post_catch_loop(window_title):
             time.sleep(0.2)
 
         if lane == -1:
-            hold_key("a")
-            release_key("d")
+            hold_key(get_pykey("left_key"))
+            release_key(get_pykey("right_key"))
         elif lane == 0:
-            release_key("a")
-            release_key("d")
+            release_key(get_pykey("left_key"))
+            release_key(get_pykey("right_key"))
         elif lane == 1:
-            hold_key("d")
-            release_key("a")
+            hold_key(get_pykey("right_key"))
+            release_key(get_pykey("left_key"))
 
         if time.time() - last_print_time >= 1:
             print(f"Held for {counter} ticks")
