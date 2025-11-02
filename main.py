@@ -3,10 +3,8 @@ import os
 import sys
 import json
 from datetime import datetime
-import win32gui
 from pynput.mouse import Controller, Button
 from pynput.keyboard import Controller as KeyboardController, Listener, KeyCode, Key
-import pyautogui
 
 from src.utils.updater import check_for_update, download_update, run_update, UpdateApi
 
@@ -146,6 +144,10 @@ def on_press(key):
 
 
 # ---------------- Window Handling ----------------
+
+import win32gui
+
+
 def focus_blue_protocol_window():
     target_title = "Blue Protocol: Star Resonance"
     hwnd = win32gui.FindWindow(None, target_title)
@@ -177,7 +179,6 @@ def get_window_rect(title):
         return None
     return win32gui.GetWindowRect(hwnd)
 
-
 # ---------------- Actions ----------------
 def click(x, y):
     time.sleep(0.05)
@@ -186,6 +187,7 @@ def click(x, y):
 
 
 def press_key(key):
+    select_window()
     time.sleep(0.05)
     keyboard.press(key)
     keyboard.release(key)
@@ -325,9 +327,6 @@ def post_catch_loop(window_title):
                     / "fish"
                 )
                 fish_type = None
-                screenshot_folder = BASE / "screenshots"
-                screenshot_folder.mkdir(parents=True, exist_ok=True)
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
                 if os.path.exists(fish_folder):
                     found = False
@@ -339,33 +338,18 @@ def post_catch_loop(window_title):
                             print(
                                 f"Detected fish type: {fish_type} (score: {score:.3f})."
                             )
-                            # screenshot_path = (
-                            #    screenshot_folder / f"screenshot_{timestamp}_{fish_type}_({score:.3f}).png"
-                            # )
-                            # pyautogui.screenshot(screenshot_path)
+
                             found = True
                             break
                         else:
-                            screenshot_path = (
-                                screenshot_folder / f"screenshot_{timestamp}.png"
-                            )
-                            pyautogui.screenshot(screenshot_path)
                             print(
-                                f"No fish detected. Screenshot saved: {screenshot_path}"
+                                f"No fish type detected."
                             )
 
                     if not found:
-                        screenshot_path = (
-                            screenshot_folder / f"screenshot_{timestamp}.png"
-                        )
-
-                        pyautogui.screenshot(screenshot_path)
-                        print(f"No fish detected. Screenshot saved: {screenshot_path}")
+                        print(f"No fish detected. ")
                 else:
-                    print("Fish folder not found, taking default screenshot")
-                    screenshot_path = screenshot_folder / f"screenshot_{timestamp}.png"
-
-                    pyautogui.screenshot(screenshot_path)
+                    print("Fish folder not found.")
 
                 # Logging
                 log_args = {"status": True}
