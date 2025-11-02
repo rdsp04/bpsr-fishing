@@ -225,28 +225,9 @@ def post_catch_loop(window_title):
 
         rect = get_window_rect(window_title)
 
-        right_found = image_service.find_image_in_window(
-            rect,
-            (
-                get_data_dir()
-                / TARGET_IMAGES_FOLDER
-                / get_resolution_folder()
-                / "right.png"
-            ),
-            0.8,
-        )
-        left_found = image_service.find_image_in_window(
-            rect,
-            (
-                get_data_dir()
-                / TARGET_IMAGES_FOLDER
-                / get_resolution_folder()
-                / "left.png"
-            ),
-            0.8,
-        )
+        arrow, score = image_service.find_minigame_arrow(rect)
 
-        if right_found:
+        if arrow is not None and "right" in arrow and score > 0.8:
             last_progress_time = time.time()
 
             lane += 1
@@ -254,7 +235,7 @@ def post_catch_loop(window_title):
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
             time.sleep(0.2)
-        elif left_found:
+        elif arrow is not None and "left" in arrow and score > 0.8:
             last_progress_time = time.time()
 
             lane -= 1
