@@ -3,9 +3,19 @@
 1. Start Blue Protocol: Star Resonance.
 2. Open BPSR Fishing.
 3. Set the game window to **1920x1080 resolution**. (Fullscreen or windowed version works)
-4. Ensure the player character is in a **fishing position** before starting.
-5. Check your amount of baits and rods, if you are not sure about the amount check **Recommendations**.
-6. Now that you are fully ready press F9 and enjoy your exp.
+4. Go to a fishing spot shown below.
+5. Check the script settings and make sure it matches with your game settings.
+6. Ensure the player character is in a **fishing position** before starting.
+7. Check your amount of baits and rods, if you are not sure about the amount check **recommendations** down below.
+8. Now that you are fully ready press F9.
+9. If anything unexpected happens check **FAQ** down below and join the **discord**.
+
+## Usage
+
+- Press **F9** to start the macro.
+- Press **F10** to stop the macro.
+- Keybinds can be changed in the settings of the script
+
 
 ## Fishing Spots
 ### Sea Water
@@ -28,11 +38,10 @@
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/73a36ddf-3673-4bd7-bd1d-facd6a724ef3" />
 </div>
 
-## Usage
+## Recommendations
 
-- Press **F9** to start the macro.
-- Press **F10** to stop the macro.
-- The script now keeps track of catches, fish types, XP, and sessions.
+- For every hour of fishing, it is recommended to have at least **200 baits** and **10 rods**.
+
 
 ## FAQ
 
@@ -40,9 +49,7 @@
 - The script must be launched **after the game is opened**.
 - The game must be placed on the **main monitor**.
 - The game window must be **visible** for the script to work properly.
-- To open script type **bpsr-fishing** in the windows search.
-- If you are unable to find script, open any folder > go to search bar and type > C:\Users\YourUsername\AppData\Local\bpsr-fishing
+- If the script doesn't do anything, run it as **administrator**
+- Make sure your game resolution is set to **1920x1080**
 
-## Recommendations
 
-- For every hour of fishing, it is recommended to have at least **200 baits** and **10 rods**.
