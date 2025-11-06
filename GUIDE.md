@@ -9,19 +9,24 @@
 
 ## Fishing Spots
 ### Sea Water
+<div>
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/6bcab7b0-415e-421b-976f-d82fc31d369c" />
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/9e10620e-065a-45ba-a233-a802b53b0837" />
+</div>
 
 
 ### Fresh Water
+<div>
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/32a763dd-1347-4714-a29d-2b17e6e4b707" />
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/091df998-6b70-4b89-9eff-1bb4dcf1417e" />
+</div>
 
 ### City
+<div>
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/de12a935-b081-4fd4-8ef1-d027b5e5a70e" />
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/2a4f0e45-f9ca-4cd6-95de-8b8e6ecd5dbe" />
 <img height="200" alt="image" src="https://github.com/user-attachments/assets/73a36ddf-3673-4bd7-bd1d-facd6a724ef3" />
-
+</div>
 
 ## Usage
 
