@@ -32,3 +32,19 @@ class FishService:
             if fish.name.lower() == fish_type.lower() or fish.id == fish_type:
                 return fish.xp
         return 0
+
+    def get_by_name(self, name: str):
+        """Return the Fish object with the given name, or None if not found."""
+        name_lower = name.lower()
+        for fish in self.fishes:
+            if fish.name.lower() == name_lower:
+                return fish
+        return None
+
+    def get_by_id(self, id: str):
+        """Return the Fish object with the given name, or None if not found."""
+        id_lower = id.lower()
+        for fish in self.fishes:
+            if fish.id.lower() == id_lower:
+                return fish
+        return None

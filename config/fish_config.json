@@ -209,9 +209,9 @@
       "category": "TRASH"
     },
     {
-      "id": "artisian_tools",
-      "image": "artisian_tools.png",
-      "name": "Artisian Tools",
+      "id": "artisan_tools",
+      "image": "artisan_tools.png",
+      "name": "Artisan Tools",
       "xp": 1,
       "rarity": "COMMON",
       "category": "TRASH"

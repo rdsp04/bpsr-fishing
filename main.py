@@ -526,6 +526,8 @@ def handle_no_progress_loop(window_title):
     while macro_start_event.is_set():
         rect = get_window_rect(window_title)
         if not rect:
+            macro_start_event.clear()
+
             time.sleep(1)
             continue
 
