@@ -560,9 +560,11 @@ def handle_no_progress_loop(window_title):
 def start_macro():
     main()
 
+from src.utils.refactor.spelling import fix_spelling
 
 if __name__ == "__main__":
     try:
+        fix_spelling()
         update = check_for_update()
         if update:
             print(f"New version available: {update['version']}")

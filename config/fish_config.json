@@ -1,9 +1,9 @@
 {
   "fishes": [
     {
-      "id": "astercad",
-      "image": "astercad.png",
-      "name": "Astercad",
+      "id": "asterscad",
+      "image": "asterscad.png",
+      "name": "Asterscad",
       "xp": 1,
       "rarity": "COMMON",
       "category": "FISH"
@@ -225,9 +225,9 @@
       "category": "TRASH"
     },
     {
-      "id": "aluminium_billboard",
-      "image": "aluminium_billboard.png",
-      "name": "Aluminium Billboard",
+      "id": "aluminum_billboard",
+      "image": "aluminum_billboard.png",
+      "name": "Aluminum Billboard",
       "xp": 1,
       "rarity": "COMMON",
       "category": "TRASH"
@@ -257,9 +257,9 @@
       "category": "TRASH"
     },
     {
-      "id": "aluminium_signboard",
-      "image": "aluminium_signboard.png",
-      "name": "Aluminium Signboard",
+      "id": "aluminum_signboard",
+      "image": "aluminum_signboard.png",
+      "name": "Aluminum Signboard",
       "xp": 1,
       "rarity": "COMMON",
       "category": "TRASH"
