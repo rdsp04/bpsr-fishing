@@ -227,7 +227,7 @@ def post_catch_loop(window_title):
 
         arrow, score = image_service.find_minigame_arrow(rect)
 
-        if arrow is not None and "right" in arrow and score > 0.8:
+        if arrow is not None and "right" in arrow and score > 0.75:
             last_progress_time = time.time()
 
             lane += 1
@@ -235,7 +235,7 @@ def post_catch_loop(window_title):
                 lane = 1
             print(f"Right arrow detected, lane = {lane}")
             time.sleep(0.2)
-        elif arrow is not None and "left" in arrow and score > 0.8:
+        elif arrow is not None and "left" in arrow and score > 0.75:
             last_progress_time = time.time()
 
             lane -= 1
@@ -267,7 +267,7 @@ def post_catch_loop(window_title):
                     / get_resolution_folder()
                     / "continue.png"
                 ),
-                0.8,
+                0.75,
             )
             if not continue_found:
                 continue_found = image_service.find_image_in_window(
@@ -278,7 +278,7 @@ def post_catch_loop(window_title):
                         / get_resolution_folder()
                         / "continue_highlighted.png"
                     ),
-                    0.8,
+                    0.75,
                 )
             default_found = image_service.find_image_in_window(
                 rect,
@@ -288,7 +288,7 @@ def post_catch_loop(window_title):
                     / get_resolution_folder()
                     / "default_screen.png"
                 ),
-                0.9,
+                0.85,
             )
             last_check_time = time.time()
 
@@ -439,7 +439,7 @@ def main():
                     / get_resolution_folder()
                     / "broken_pole.png"
                 ),
-                0.9,
+                0.85,
             )
             if broken_pole:
                 print("Broken pole detected -> pressing M")
@@ -456,7 +456,7 @@ def main():
                         / get_resolution_folder()
                         / "use_rod.png"
                     ),
-                    0.9,
+                    0.85,
                 )
                 if use_rod:
                     last_progress_time = time.time()
@@ -484,7 +484,7 @@ def main():
                         / get_resolution_folder()
                         / "catch_fish.png"
                     ),
-                    0.9,
+                    0.85,
                 )
                 if catch_coords:
                     last_progress_time = time.time()
@@ -538,7 +538,7 @@ def handle_no_progress_loop(window_title):
             / TARGET_IMAGES_FOLDER
             / get_resolution_folder()
             / "default_screen.png",
-            0.9,
+            0.85,
         )
         if default_found:
             print("Default screen detected, stopping recovery loop.")
